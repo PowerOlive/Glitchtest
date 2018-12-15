@@ -1,0 +1,29 @@
+#    Whether the player has stamina.
+sneak_jump.stamina_drains (Stamina drains) bool true
+
+#    Stamina drain rate.
+sneak_jump.drain_rate (Stamina drain rate) float 0.1
+
+#    Stamina fill rate.
+sneak_jump.fill_rate (Stamina fill rate) float 0.25
+
+#    Sneak jump sprint speed.
+sneak_jump.speed (Sneak jump sprint speed) float 1.5
+
+#    Sneak jump height.
+sneak_jump.jump (Sneak jump height) float 1.25
+
+#    Sneak jump gravity.
+sneak_jump.gravity (Sneak jump gravity) float 0.95
+
+#    Whether player has hunger.
+sneak_jump.hunger (Hunger) bool true
+
+#    Hunger starvation rate.  Lower equals faster starvation.
+sneak_jump.starve_rate (Starve rate) float 0.5
+
+#    Heart regeneration rate.
+sneak_jump.regen_rate (Regen rate) float 15.0
+
+#    How much to divide item eat points by.
+sneak_jump.food_governor (Item eat amount limiter) float 2.0

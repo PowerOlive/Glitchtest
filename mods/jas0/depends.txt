@@ -1,0 +1,3 @@
+bones
+give_initial_stuff
+sneak_jump

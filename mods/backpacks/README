@@ -1,0 +1,13 @@
+Backpacks mod for Glitchtest
+Copyright 2018 James Stevenson
+GNU GPL 3
+
+Leather bag crafted with eight leather.
+Colored wool backpacks crafted with eight wool.
+
+Backpacks can be renamed.  Placing a backpack on the craftgrid and
+obtaining the two leather output results in the contents of the backpack
+spewing around the player.
+
+Backpacks must be placed on the ground, and will fall if their supporting
+node is removed.

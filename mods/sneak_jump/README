@@ -1,0 +1,13 @@
+Minetest Sneak Jump Mod
+
+Allows to sneak jump while player is holding the Use key (default [E]) only.
+Adds (optional) stamina.  Stamina drain and fill rates are configurable, as well
+as sprinting speed, jump height, and gravity.  Check settingtypes.txt for the
+configuration parameters, or look in the Advanced Settings tab in Minetest.
+
+When not sprinting, `new_move` is on and `sneak_glitch` is disabled.  Sprinting
+inverts these two physics overrides, allowing sneak jumping using the old move
+code.
+
+License: LGPL 2.1+
+sneak_jump_eat.ogg is: hunger_eat.ogg - BlockMen (CC-BY 3.0)

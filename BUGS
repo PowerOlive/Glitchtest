@@ -1,0 +1,31 @@
+I fixed multiskin erroring on "default:dirt" texture.  Now, it appears that when
+	joining the game as a node class, that when wielding a walkie after
+	changing back to miner results in the compass being shown behind the hearts!
+	[This should be okay, now.  I just reorganized the order of hud flags
+	being set, seemed to work.]
+
+Sometimes switching to/from node class results in bugs.  Like getting an item in your
+	hand from prior class.  Or the hotbar on the hud showing visual glitches
+	(vertical lines).  There's also the matter of multiskin attempting to set
+	player's skin to "default:dirt" and the like.
+
+Explosions seem to erase backpacks, other stuff.  I did function() end on on_blast
+	for backpack, hopefully that helps.  Still need to explode the contents.
+
+I was underground battling with Oerkki and NPCs, when I saw the minimap come on when I hit
+	the button.  But, I didn't have a walkie!  What?  [Got it, forgot to turn it off
+	if wielded ~= walkie... -jas]
+
+Sometimes the player's HP (built-in statbar, not override (breath is hidden/off)) does not
+	display on the HUD.  The reason, I suspect, is because I had a level 99 miner
+	and 1/99 HP shows as zero (out of twenty) on the HUD.  I wonder if I can override
+	it easily, I don't want to redo the HP statbar, but I might eventually.  [Update:
+	Armor suffers the same issue, if a very low value, shows as `0' on statbar!]
+
+When the player's `wielditem' (mod), in third person, item is constantly set, models resets.
+	Example: Holding a walkie talkie, which is always setting(?).  Or updating something,
+	causing the model to reset (not fully animate, go back to frame 0 repeatedly)...
+
+The last item on the list of teleports in the bed formspec, if deleted, doesn't
+	update the index.  So what happens is that once you delete the last
+	item, it won't work again until you select a new item.
