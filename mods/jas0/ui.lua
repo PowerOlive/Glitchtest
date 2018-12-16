@@ -26,7 +26,10 @@ end
 
 local log1 = {["walkie"] = {
 	["nowield"] = "You need to wield a Walkie Talkie in your hand to warp home!",
-	["spawn"] = "You need to wield a Walkie Talkie in your hand to respawn!",
+	["spawn"] = "You need to wield a Walkie Talkie in your hand to warp to your " ..
+		"respawn position.\n\nWould you like to warp to the server spawn point?" ..
+		"\n\nThis option can be set in the walkie." ..
+	"",
 	["home"] = "You don't have a home!  To set your home, " ..
 		"activate an Intercomm using your " ..
 		"Walkie Talkie, or [Set Home] using a Bed." ..
@@ -85,7 +88,10 @@ jas0.message = message
 
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-	if formname ~= "" then
+	if formname == "jas0:respawn" and fields.ok then
+		spawn.on_spawn(player)
+		return
+	elseif formname ~= "" then
 		return false
 	end
 	local wielded = player:get_wielded_item():get_name()
@@ -103,8 +109,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				spawn.on_spawn(player)
 			end
 		else
-			message(name, log1["walkie"]["spawn"], true)
-			-- TODO Would you like to go to the server spawn?
+			message(name, log1["walkie"]["spawn"], true, "jas0:respawn", "No Wielded Walkie", true)
 			return false
 		end
 	elseif fields.home then

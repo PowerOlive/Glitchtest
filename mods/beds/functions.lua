@@ -268,6 +268,67 @@ local function beds_list_fs(player, index, tab)
 	return formspec
 end
 
+minetest.register_chatcommand("setspawn", {
+	description = "Set your respawn location",
+	params = "none",
+	privs = "interact",
+	func = function(name, param)
+		local player = minetest.get_player_by_name(name)
+		if not player then
+			return false, "You must be in the game for this command to work."
+		end
+		local pos = player:get_pos()
+		beds.spawn[name] = pos
+		return true, "Your respawn position has been saved."
+	end,
+})
+minetest.register_chatcommand("sethome", {
+	description = "Set your home location",
+	params = "none",
+	privs = "interact",
+	func = function(name, param)
+		local player = minetest.get_player_by_name(name)
+		if not player then
+			return false, "You need to be in game for this command to work."
+		end
+		local wielded = player:get_wielded_item()
+		if wielded:get_name() ~= "walkie:talkie" then
+			return false, "You need to wield a walkie in your hand " ..
+					"for this command to work."
+		end
+		local pos = player:get_pos()
+		walkie.players[name].waypoints.saved = pos
+		walkie.players[name].waypoints.pos = pos
+		player:hud_change(walkie.meters[name].waypoint,
+				"world_pos", pos)
+		player:get_meta():set_string("waypoints",
+				minetest.serialize(walkie.players[name].waypoints))
+		return true, "Your home has been set to your current location."
+	end,
+})
+minetest.register_chatcommand("home", {
+	description = "Teleport to your home position",
+	params = "none",
+	privs = "interact",
+	func = function(name, param)
+		local player = minetest.get_player_by_name(name)
+		if not player then
+			return
+		end
+		local wielded = player:get_wielded_item()
+		if wielded:get_name() ~= "walkie:talkie" then
+			return false, "You need to wield a walkie in your hand."
+		end
+		local pos = walkie.players[name].waypoints.saved
+		if pos then
+			player:set_pos(pos)
+			return true, "You have warped to your home position."
+		else
+			return false, "You have yet to save a home location!"
+		end
+	end,
+})
+
 local beds_list_index = {}
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if formname == "beds:inventory" then
