@@ -1,9 +1,14 @@
 -- Terminal mod for Minetest `Glitchtest' game
--- (C) 2018 James Alexander Stevenson
+-- Copyright 2018 James Alexander Stevenson
 -- GNU GPL 3
 
 terminal = {}
 local store = minetest.get_mod_storage()
+
+local function close_fs(name, pos, source_n)
+	minetest.close_formspec(name, "terminal" .. source_n ..
+			minetest.pos_to_string(pos))
+end
 
 terminal.display = function(source, user, pos, input)
 	if not source or not user then
@@ -11,6 +16,7 @@ terminal.display = function(source, user, pos, input)
 	end
 	local pos = pos or user:get_pos()
 	local input = input or ""
+	input = input:sub(1, 400) -- Limit input length.
 	local name = user:get_player_name()
 
 	local cmd_table = {
@@ -19,13 +25,17 @@ terminal.display = function(source, user, pos, input)
 	}
 
 	local term_name, hint, info, wielded, meta
+	local source_n
 	if source == "item" then
 		wielded = user:get_wielded_item()
 		meta = wielded:get_meta()
+		source_n = 1
 	elseif source == "node" then
 		meta = minetest.get_meta(pos)
+		source_n = 2
 	elseif source == "mod" then
 		meta = store
+		source_n = 3
 	else
 		return
 	end
@@ -34,11 +44,10 @@ terminal.display = function(source, user, pos, input)
 	-- Determine input.
 	input = minetest.formspec_escape(input)
 	term_name = meta:get_string("term_name") or "default"
-	hint = "There is no hint."
+	hint = "Some features are better hidden than others."
 	info = "Welcome to terminal."
 
 	local feedback = ""
-
 	-- Get table with command/args.
 	local command = input
 	local args = {}
@@ -75,6 +84,8 @@ terminal.display = function(source, user, pos, input)
 	elseif command == "say" then
 		feedback = function()
 			local chat_message = input:sub(5, -1)
+			jas0.message(name, chat_message)
+			close_fs(name, pos, source_n)
 		end
 	elseif command == "broadcast" then
 		output = "Broadcasting to all players with a walkie talkie on any channel."
@@ -85,8 +96,7 @@ terminal.display = function(source, user, pos, input)
 		output = "Shutting down..."
 		feedback = ""
 		minetest.after(1, function()
-			minetest.close_formspec(name, "terminal" .. source ..
-					minetest.pos_to_string(pos))
+			close_fs(name, pos, source_n)
 		end)
 	elseif command == "channel" then
 		local ch = tonumber(args[2])
@@ -96,14 +106,6 @@ terminal.display = function(source, user, pos, input)
 		--feedback = "You are on channel " .. tostring(dcbl.channels[name].channel)
 		feedback = "TODO: Implement chat channels."
 	elseif command == "echo" then
-		--[[
-		local new_input = input
-		if new_input:len() >= 40 then
-			command = new_input:sub(1, 40) .. "$"
-		else
-			command = input
-		end
-		--]]
 		if type(args[2]) == "string" then
 			for i = 2, #args do
 				if output == "" then
@@ -119,7 +121,7 @@ terminal.display = function(source, user, pos, input)
 	elseif command == "guestbook" then
 		command = input
 		output = "Guestbook entries:\n" .. meta:get_string("guestbook") or ""
-		feedback = "There you go!"
+		feedback = "Those are the guestbook entries."
 	elseif command == "help" then
 		command = input
 		if args[2] then
@@ -142,6 +144,7 @@ terminal.display = function(source, user, pos, input)
 		output = minetest.formspec_escape(info)
 		feedback = ""
 	elseif command == "list" then
+		--[[
 		local chatters = ""
 		for _, player in pairs(minetest.get_connected_players()) do
 			if player:get_inventory():contains_item("main", "walkie:talkie") then
@@ -154,6 +157,27 @@ terminal.display = function(source, user, pos, input)
 			output = chatters
 		end
 		feedback = "Players on channel 1 or near intercomm listed."
+		--]]
+		if args[2] and args[2] == "warps" then
+			if not args[3] then
+				output = "`public' or `private'"
+			elseif args[3] == "private" then
+				local beds = beds.beds[name]
+				for k, v in pairs(beds) do
+					output = output .. k .. ", "
+				end
+				output = output:sub(1, -3)
+			elseif args[3] == "public" then
+				local pub_beds = beds.beds_public
+				for k, v in pairs(pub_beds) do
+					for kk, vv in pairs(v) do
+						output = output .. kk .. ", "
+						output = output:sub(1, -3)
+					end
+				end
+			end
+		end
+		feedback = "List `warps', ..."
 	elseif command == "name" then
 		command = input
 		local args = args[2]
@@ -174,8 +198,8 @@ terminal.display = function(source, user, pos, input)
 		end
 		feedback = ""
 	elseif command == "set" then
+		--[[
 		if args[2] == "warp" then
-			--[[
 			local pt_under = meta:get_string("pt_under")
 			if not pt_under or pt_under == "" then
 				return
@@ -190,10 +214,37 @@ terminal.display = function(source, user, pos, input)
 			end
 			minetest.get_meta(nn):set_string("warps_destination", args[3])
 			meta:set_string("pt_under", nil)
-			--]]
 			feedback = "TODO"
 		end
-		feedback = "TODO"
+		--]]
+		if args[2] and args[2] == "spawn_switch" then
+			local pm = user:get_meta()
+			local ss = pm:get_int("spawn_switch")
+			output = "Choose between clicking spawn in inventory " ..
+				"sending you to server spawn location, or your " ..
+				"own set respawn position." ..
+			""
+			if not args[3] then
+				if ss == 1 then
+					pm:set_int("spawn_switch", 0)
+					output = output .. "\n\nSpawn switch is now off."
+				else
+					pm:set_int("spawn_switch", 1)
+					output = output .. "\n\nSpawn switch is now on."
+				end
+			else
+				if args[3] == "on" then
+					pm:set_int("spawn_switch", 1)
+					output = output .. "\n\nSpawn switch is now on."
+				elseif args[3] == "off" then
+					pm:set_int("spawn_switch", 0)
+					output = output .. "\n\nSpawn switch is now off."
+				else
+					output = output .. "\n\nEnter `on' or `off'."
+				end
+			end
+		end
+		feedback = "`home', `spawn_switch'"
 	elseif command == "sign" then
 		command = "Signed:" 
 		local s = ""
@@ -217,6 +268,7 @@ terminal.display = function(source, user, pos, input)
 		local user_beds = beds.beds[name]
 		if user_beds and user_beds[args[2]] then
 			user:set_pos(user_beds[args[2]])
+			return close_fs(name, pos, source_n)
 		end
 	elseif command == "waypoint" then
 		output = "set|display"
@@ -228,64 +280,23 @@ terminal.display = function(source, user, pos, input)
 	if type(feedback) == "function" then
 		return feedback()
 	end
-	-- Determine output.
-	if #output > 40 then
-		local old_output = output
-		local spos = 0
-		local old_spos = 0
-		local ln1 = ""
-		local ln2 = ""
-		local ln3 = ""
-		local new_output
-		for p in old_output:gmatch"." do
-			spos = spos + 1
-			if spos >= 40 and p == " " and ln1 == "" then
-				ln1 = old_output:sub(1, spos)
-				ln2 = old_output:sub(spos + 1, -1)
-				old_spos = spos
-			end
-			if spos >= 80 and p == " " and ln2 ~= "" then
-				ln2 = old_output:sub(old_spos + 1, spos)
-				ln3 = old_output:sub(spos + 1, 120)
-				break
-			end
-		end
-		new_output = ln1 .. "\n" .. ln2 .. "\n" .. ln3
-		if old_output:len() > 120 then
-			output = new_output ..
-					"\n\n" .. minetest.formspec_escape(feedback) ..
-					"\n" .. minetest.formspec_escape("[more]")
-		else
-			output = new_output .. "\n\n" .. minetest.formspec_escape(feedback)
-		end
-	else
-		output = output .. "\n\n\n\n" .. minetest.formspec_escape(feedback)
-	end
-	local fs_command = "label[0,0.1;> " .. command .. "]"
-	local fs_output = "label[0,0.6;" .. output .. "]"
-	if command == "echo" then
-		fs_command = ""
-		fs_output = "label[0,0.1;" .. output .. "]"
-	end
-		
-	-- Collect data and display.
-	local formspec = "size[8.8,5.9]" ..
-			default.gui_bg_img ..
-			"box[-.1,-.0;8.78,5.1;gray]" ..
-			fs_command ..
-			fs_output ..
-			"field[0.18,5.6;8,1;input;;]" ..
-			"button[7.78,5.3;1.15,1;ok;OK]" ..
-			"field_close_on_enter[input;false]"
 
-	if source == "item" then
-		source = 1
-	elseif source == "node" then
-		source = 2
-	elseif source == "mod" then
-		source = 3
-	end
-	return minetest.show_formspec(name, "terminal" .. source ..
+	-- Collect data and display.
+	output = output .. "\n\n\n\n" .. minetest.formspec_escape(feedback)
+	local fs_command = "label[0,0.1;> " .. command .. "]"
+	local fs_output = "textarea[0.334,0.667;8.88,5.14;;;" .. output .. "]"
+
+	local formspec = "size[8.8,5.9]" ..
+		default.gui_bg_img ..
+		"box[-.1,-.0;8.78,5.1;gray]" ..
+		fs_command ..
+		fs_output ..
+		"field[0.18,5.6;8,1;input;;]" ..
+		"button[7.78,5.3;1.15,1;ok;OK]" ..
+		"field_close_on_enter[input;false]" ..
+	""
+
+	return minetest.show_formspec(name, "terminal" .. source_n ..
 			minetest.pos_to_string(pos), formspec)
 end
 
@@ -298,13 +309,14 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local pos = minetest.string_to_pos(formname:sub(10))
 	local source = tonumber(formname:sub(9, 9))
 	if fields.ok and fields.input == "" then
-		return minetest.close_formspec(name, "terminal" .. source ..
-				minetest.pos_to_string(pos))
+		return close_fs(name, pos, source)
 	end
 	local s = {"item", "node", "mod"}
 	source = s[source]
 	terminal.display(source, player, pos, fields.input)
 end)
+-- TODO Make hide_chat setting.  Send all chat to walkie mod.
+-- 	But make setting hide top-left chat in present.
 --[[
 minetest.register_on_chat_message(function(name, message)
 	local player = minetest.get_player_by_name(name)
@@ -321,13 +333,11 @@ minetest.register_on_chat_message(function(name, message)
 	return true
 end)
 --]]
----[[
 minetest.register_privilege("terminal", {
 	description = "Can use /terminal command",
 	give_to_singleplayer = false,
 	give_to_admin = true,
 })
-
 minetest.register_chatcommand("terminal", {
 	description = "Display terminal interface",
 	params = "[<input>]",
@@ -340,4 +350,3 @@ minetest.register_chatcommand("terminal", {
 		terminal.display("mod", player, player:get_pos(), param)
 	end
 })
---]]

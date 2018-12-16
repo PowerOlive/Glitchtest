@@ -91,6 +91,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local wielded = player:get_wielded_item():get_name()
 	local name = player:get_player_name()
 	if fields.spawn then
+		local ss = player:get_meta():get_int("spawn_switch")
+		if ss and ss == 1 then
+			spawn.on_spawn(player)
+			return
+		end
 		if wielded == "walkie:talkie" then
 			if beds.spawn[name] then
 				player:set_pos(beds.spawn[name])
@@ -99,6 +104,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			end
 		else
 			message(name, log1["walkie"]["spawn"], true)
+			-- TODO Would you like to go to the server spawn?
 			return false
 		end
 	elseif fields.home then

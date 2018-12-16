@@ -328,7 +328,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			if not beds.beds[name] then
 				beds.beds[name] = {}
 			end
-			if beds.beds[name][home_name] or beds.beds_public[name][home_name] then
+			if beds.beds[name][home_name] or (beds.beds_public[name] and
+					beds.beds_public[name][home_name]) then
 				return jas0.message(name, "This name already exists!",
 						true)
 			end
