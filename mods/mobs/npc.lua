@@ -5,14 +5,14 @@
 -- NPC by TenPlus1
 -- Trader enhancements by jas
 
-
+local random = math.random
 local S = mobs.intllib
 
 mobs.npc_drops = {
-	"default:pick_steel", "mobs:meat 2", "default:sword_steel",
-	"default:shovel_steel", "farming:bread", "bucket:bucket_water",
+	"default:pick_steel", "default:apple 3", "default:sword_steel",
+	"default:shovel_steel", "farming:bread", "fireflies:bug_net",
 	"walkie:talkie", "craftguide:book", "default:book",
-	"mobs:shears", "default:axe_steel", "default:diamond",
+	"mobs:shears", "default:axe_steel", "default:mese_crystal_fragment",
 	"default:papyrus",
 }
 
@@ -27,11 +27,26 @@ local function mob_detached_inv(self)
 		allow_take = function(inv, listname, index, stack, player)
 			local name = player:get_player_name()
 			local detached = minetest.create_detached_inventory("trade_" .. self.tid, {
-				allow_put = function(inv, listname, index, stack, player)
-					if index ~= 2 then
+				allow_put = function(r_inv, r_listname, r_index, r_stack, r_player)
+					if r_index ~= 2 then
 						return 0
 					else
-						return stack:get_count()
+						local v = minetest.get_item_group(r_stack:get_name(),
+								"trade_value") * r_stack:get_count()
+						if v == 0 then
+							v = 1
+						end
+						local t_v = minetest.get_item_group(stack:get_name(),
+								"trade_value") * stack:get_count()
+						if v >= t_v then
+							jas0.message(name, "Okay!")
+							return r_stack:get_count()
+						else
+							jas0.message(name,
+									"Is that all?  I'm afraid it's not enough.",
+									true)
+							return 0
+						end
 					end
 				end,
 				allow_move = function()
@@ -41,15 +56,25 @@ local function mob_detached_inv(self)
 					return 0
 				end,
 				on_put = function(p_inv, p_listname, p_index, p_stack, p_player)
+					inv:set_stack(listname, index, "")
 					local player_inv = p_player:get_inventory()
-					player_inv:add_item("main", p_inv:get_stack("exchange", 1))
-					p_inv:set_list("exchange", {})
-					minetest.close_formspec(name, "npc:npc_trade")
-					--[[
-					if not self.owner or self.owner == "" then
-						self.object:get_luaentity().owner = p_player:get_player_name()
+					local y = player_inv:add_item("main", p_inv:get_stack("exchange", 1))
+					if y then
+						minetest.add_item(pos, y)
 					end
-					--]]
+					if inv:room_for_item("trade", p_stack) then
+						inv:add_item("trade", p_stack)
+					else
+						self.shop = "probably_closed"
+					end
+					local list = inv:get_list("trade")
+					for i = 1, #list do
+						list[i] = list[i]:to_string()
+					end
+					self.inv = minetest.serialize(list)
+					p_inv:set_list("exchange", {})
+					jas0.message(name, "Thank you for your patronage!", true)
+
 					return -1, minetest.remove_detached_inventory("trade_" .. self.tid)
 				end,
 			})
@@ -63,7 +88,6 @@ local function mob_detached_inv(self)
 				"list[current_player;main;0,3.6;8,3;8]" ..
 				default.get_hotbar_bg(0, 2.5) ..
 			""
-			inv:set_stack("trade", index, "")
 			local list = inv:get_list("trade")
 			for i = 1, #list do
 				list[i] = list[i]:to_string()
@@ -154,22 +178,33 @@ mobs:register_mob("mobs:npc", {
 			local inv_id = minetest.create_detached_inventory("npc_" ..
 					tid, mob_detached_inv(self))
 			inv_id:set_size("trade", 8 * 4)
-			for i = math.random(1, 2), #dresser.skins, 2 do
-				inv_id:add_item("trade", "dresser:skin_" .. dresser.skins[i][1])
+
+			local ls = {
+				"dresser:skin_" .. dresser.skins[random(#dresser.skins)][1],
+
+			}
+			for i = random(1, 2), #mobs.npc_drops, 2 do
+				table.insert(ls, mobs.npc_drops[i])
 			end
-			for i = math.random(1, 2), #mobs.npc_drops, 2 do
-				inv_id:add_item("trade", mobs.npc_drops[i])
-			end
-			for i = math.random(1, 2), #dungeon_loot.registered_loot, 2 do
-				if dungeon_loot.registered_loot[i].chance > 0.2 then
-					inv_id:add_item("trade", dungeon_loot.registered_loot[i].name)
+			local d_loot = dungeon_loot.registered_loot
+			local c = d_loot.count or {1, 2}
+			for i = random(1, random(2, 3)), #d_loot, 2 do
+				if d_loot[i].chance > random() then
+					table.insert(ls,
+							d_loot[i].name .. " " ..
+							random(c[1], c[2]))
 				end
 			end
-			local inventory = inv_id:get_list("trade")
-			for i = 1, #inventory do
-				inventory[i] = inventory[i]:to_string()
+			for i = #ls, 1, -1 do
+				local r = random(#ls)
+				ls[i], ls[r] = ls[r], ls[i]
 			end
-			self.inv = minetest.serialize(inventory)
+			inv_id:set_list("trade", ls)
+			ls = inv_id:get_list("trade")
+			for i = 1, #ls do
+				ls[i] = ls[i]:to_string()
+			end
+			self.inv = minetest.serialize(ls)
 			self.tid = tid
 		else
 			local mob_inv = minetest.get_inventory({type = "detached",

@@ -86,7 +86,7 @@ minetest.register_node("fireflies:hidden_firefly", {
 minetest.register_tool("fireflies:bug_net", {
 	description = "Net\nRight-click for mobs\nLeft-click for bugs",
 	inventory_image = "fireflies_bugnet.png",
-	groups = {tool = 1},
+	groups = {tool = 1, trade_value = 2,},
 	on_use = function(itemstack, player, pointed_thing)
 		if not pointed_thing or pointed_thing.type ~= "node" or
 				minetest.is_protected(pointed_thing.under, player:get_player_name()) then

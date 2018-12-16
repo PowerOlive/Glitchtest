@@ -502,7 +502,7 @@ mt.register_craftitem("craftguide:book", {
 	inventory_image = "craftguide_book.png",
 	wield_image = "craftguide_book.png",
 	stack_max = 1,
-	groups = {book = 1},
+	groups = {book = 1, trade_value = 3,},
 	on_use = function(itemstack, user)
 		craftguide:on_use(itemstack, user)
 	end

@@ -168,6 +168,7 @@ minetest.register_craftitem("walkie:talkie", {
 	description = "Walkie Talkie",
 	inventory_image = "walkie_talkie.png",
 	stack_max = 1,
+	groups = {trade_value = 4,},
 	on_use = function(itemstack, user, pointed_thing)
 		local sound = minetest.sound_play({name = "walkie_blip", gain = 0.667},
 				{object = user,	loop = true})

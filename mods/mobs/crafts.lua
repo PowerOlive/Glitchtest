@@ -89,7 +89,7 @@ minetest.register_craft({
 minetest.register_tool("mobs:shears", {
 	description = S("Steel Shears"),
 	inventory_image = "mobs_shears.png",
-	groups = {flammable = 2},
+	groups = {flammable = 2, tool = 1, trade_value = 3,},
 })
 minetest.register_craft({
 	output = "mobs:shears",

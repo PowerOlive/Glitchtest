@@ -115,6 +115,7 @@ minetest.register_craftitem("bucket:bucket_empty", {
 	inventory_image = "bucket.png",
 	stack_max = 99,
 	liquids_pointable = true,
+	groups = {trade_value = 2,},
 	on_use = function(itemstack, user, pointed_thing)
 		if pointed_thing.type == "object" then
 			pointed_thing.ref:punch(user, 1.0, { full_punch_interval=1.0 }, nil)
@@ -186,7 +187,7 @@ bucket.register_liquid(
 	"bucket:bucket_water",
 	"bucket_water.png",
 	"Water Bucket",
-	{water_bucket = 1}
+	{water_bucket = 1, trade_value = 3,}
 )
 
 -- River water source is 'liquid_renewable = false' to avoid horizontal spread
@@ -201,7 +202,7 @@ bucket.register_liquid(
 	"bucket:bucket_river_water",
 	"bucket_river_water.png",
 	"River Water Bucket",
-	{water_bucket = 1},
+	{water_bucket = 1, trade_value = 4},
 	true
 )
 
@@ -210,7 +211,8 @@ bucket.register_liquid(
 	"default:lava_flowing",
 	"bucket:bucket_lava",
 	"bucket_lava.png",
-	"Lava Bucket"
+	"Lava Bucket",
+	{trade_value = 5,}
 )
 
 minetest.register_craft({

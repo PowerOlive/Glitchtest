@@ -20,6 +20,7 @@ for i = 1, #dresser.skins do
 		description = name,
 		inventory_image = "multiskin_" .. file .. "_inv.png",
 		stack_max = 1,
+		groups = {trade_value = 2,},
 		on_use = function(itemstack, user, pointed_thing)
 			multiskin.set_player_skin(user,
 					"multiskin_" .. file .. ".png")

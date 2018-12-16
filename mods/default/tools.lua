@@ -79,7 +79,7 @@ minetest.register_tool("default:pick_steel", {
 		},
 		damage_groups = {fleshy=4},
 	},
-	groups = {tool = 1},
+	groups = {tool = 1, trade_value = 3,},
 	sound = {breaks = "default_tool_breaks"},
 })
 
@@ -177,7 +177,7 @@ minetest.register_tool("default:shovel_steel", {
 		},
 		damage_groups = {fleshy=3},
 	},
-	groups = {tool = 1},
+	groups = {tool = 1, trade_value = 3,},
 	sound = {breaks = "default_tool_breaks"},
 })
 
@@ -273,7 +273,7 @@ minetest.register_tool("default:axe_steel", {
 		},
 		damage_groups = {fleshy=4},
 	},
-	groups = {tool = 1},
+	groups = {tool = 1, trade_value = 3,},
 	sound = {breaks = "default_tool_breaks"},
 })
 
@@ -367,7 +367,7 @@ minetest.register_tool("default:sword_steel", {
 		},
 		damage_groups = {fleshy=6},
 	},
-	groups = {tool = 1},
+	groups = {tool = 1, trade_value = 3,},
 	sound = {breaks = "default_tool_breaks"},
 })
 

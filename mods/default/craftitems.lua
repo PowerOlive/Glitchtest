@@ -3,7 +3,7 @@
 minetest.register_craftitem("default:stick", {
 	description = "Stick",
 	inventory_image = "default_stick.png",
-	groups = {stick = 1, flammable = 2},
+	groups = {stick = 1, flammable = 2, trade_value = 1},
 })
 
 minetest.register_craftitem("default:paper", {
@@ -159,7 +159,7 @@ end)
 minetest.register_craftitem("default:book", {
 	description = "Book",
 	inventory_image = "default_book.png",
-	groups = {book = 1, flammable = 3},
+	groups = {book = 1, flammable = 3, trade_value = 3},
 	on_use = book_on_use,
 })
 
@@ -259,7 +259,7 @@ minetest.register_craftitem("default:skeleton_key", {
 minetest.register_craftitem("default:coal_lump", {
 	description = "Coal Lump",
 	inventory_image = "default_coal_lump.png",
-	groups = {coal = 1, flammable = 1}
+	groups = {coal = 1, flammable = 1, trade_value = 2}
 })
 
 minetest.register_craftitem("default:iron_lump", {
@@ -280,51 +280,61 @@ minetest.register_craftitem("default:tin_lump", {
 minetest.register_craftitem("default:mese_crystal", {
 	description = "Mese Crystal",
 	inventory_image = "default_mese_crystal.png",
+	groups = {trade_value = 5,},
 })
 
 minetest.register_craftitem("default:gold_lump", {
 	description = "Gold Lump",
 	inventory_image = "default_gold_lump.png",
+	groups = {trade_value = 5,},
 })
 
 minetest.register_craftitem("default:diamond", {
 	description = "Diamond",
 	inventory_image = "default_diamond.png",
+	groups = {trade_value = 13,},
 })
 
 minetest.register_craftitem("default:clay_lump", {
 	description = "Clay Lump",
 	inventory_image = "default_clay_lump.png",
+	groups = {trade_value = 1},
 })
 
 minetest.register_craftitem("default:steel_ingot", {
 	description = "Steel Ingot",
 	inventory_image = "default_steel_ingot.png",
+	groups = {trade_value = 2},
 })
 
 minetest.register_craftitem("default:copper_ingot", {
 	description = "Copper Ingot",
 	inventory_image = "default_copper_ingot.png",
+	groups = {trade_value = 2},
 })
 
 minetest.register_craftitem("default:tin_ingot", {
 	description = "Tin Ingot",
 	inventory_image = "default_tin_ingot.png",
+	groups = {trade_value = 2},
 })
 
 minetest.register_craftitem("default:bronze_ingot", {
 	description = "Bronze Ingot",
 	inventory_image = "default_bronze_ingot.png",
+	groups = {trade_value = 2},
 })
 
 minetest.register_craftitem("default:gold_ingot", {
 	description = "Gold Ingot",
-	inventory_image = "default_gold_ingot.png"
+	inventory_image = "default_gold_ingot.png",
+	groups = {trade_value = 7,},
 })
 
 minetest.register_craftitem("default:mese_crystal_fragment", {
 	description = "Mese Crystal Fragment",
 	inventory_image = "default_mese_crystal_fragment.png",
+	groups = {trade_value = 2,},
 })
 
 minetest.register_craftitem("default:clay_brick", {
@@ -339,7 +349,8 @@ minetest.register_craftitem("default:obsidian_shard", {
 
 minetest.register_craftitem("default:flint", {
 	description = "Flint",
-	inventory_image = "default_flint.png"
+	inventory_image = "default_flint.png",
+	groups = {trade_value = 3,},
 })
 
 minetest.register_craftitem("default:blueberries", {
