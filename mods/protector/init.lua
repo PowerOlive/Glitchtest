@@ -361,7 +361,7 @@ local player_pos = {}
 
 -- protection node
 minetest.register_node("protector:protect", {
-	description = "Protection Block" .. "\n" ..
+	description = "Protection Block\n" ..
 			"Swing me to see if what's pointed is protected!",
 	drawtype = "nodebox",
 	tiles = {
@@ -452,7 +452,8 @@ minetest.register_craft({
 
 -- protection logo
 minetest.register_node("protector:protect2", {
-	description = S("Protection Logo") .. " (" .. S("USE for area check") .. ")",
+	description = "Protection Logo\n" ..
+			"Swing me to see if what's pointed is protected!",
 	tiles = {"protector_logo.png"},
 	wield_image = "protector_logo.png",
 	inventory_image = "protector_logo.png",

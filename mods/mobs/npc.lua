@@ -8,6 +8,35 @@
 local random = math.random
 local S = mobs.intllib
 
+local price_guide = {}
+for k, v in pairs(minetest.registered_items) do
+	local c = v.groups.trade_value
+	if not c then
+		c = 1
+	end
+	price_guide[k] = c
+end
+local pg_s = ""
+for item, cost in pairs(price_guide) do
+	if item:match(":") then
+		item = minetest.registered_items[item].description
+		if item ~= "" then
+			if item:find("\n") then
+				item = item:gsub("[\n].*$", "")
+			elseif item:find(",") then
+				item = item:gsub(",", "\\,")
+			end
+			pg_s = pg_s .. item .. "," .. cost .. ","
+		end
+	end
+end
+pg_s = pg_s:sub(1, -2)
+local pg_fs = "size[8,8]" ..
+	"tablecolumns[text,width=8;text,padding=1.0]" ..
+	--"tableoptions[]" ..
+	"table[0,0;7.8,8.1;pg;" .. pg_s .. ";1]" ..
+""
+
 mobs.npc_drops = {
 	"default:pick_steel", "default:apple 3", "default:sword_steel",
 	"default:shovel_steel", "farming:bread", "fireflies:bug_net",
@@ -15,6 +44,13 @@ mobs.npc_drops = {
 	"mobs:shears", "default:axe_steel", "default:mese_crystal_fragment",
 	"default:papyrus",
 }
+
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+	if (formname == "mobs:npc" or formname == "mobs:npc_trade") and
+			fields.help then
+		minetest.show_formspec(player:get_player_name(), "mobs:npc_trade_list", pg_fs)
+	end
+end)
 
 local function mob_detached_inv(self)
 	return {
@@ -32,14 +68,18 @@ local function mob_detached_inv(self)
 						return 0
 					else
 						local v = minetest.get_item_group(r_stack:get_name(),
-								"trade_value") * r_stack:get_count()
+								"trade_value")
 						if v == 0 then
 							v = 1
 						end
+						v = v * r_stack:get_count()
 						local t_v = minetest.get_item_group(stack:get_name(),
-								"trade_value") * stack:get_count()
+								"trade_value")
+						if t_v == 0 then
+							t_v = 1
+						end
+						t_v = t_v * stack:get_count()
 						if v >= t_v then
-							jas0.message(name, "Okay!")
 							return r_stack:get_count()
 						else
 							jas0.message(name,
@@ -75,13 +115,14 @@ local function mob_detached_inv(self)
 					p_inv:set_list("exchange", {})
 					jas0.message(name, "Thank you for your patronage!", true)
 
-					return -1, minetest.remove_detached_inventory("trade_" .. self.tid)
+					return -1
 				end,
 			})
 			detached:set_size("exchange", 2 * 1)
 			detached:add_item("exchange", stack)
 			local trade_fs = "size[8,6.5]" ..
 				jas0.exit_button() ..
+				jas0.help_button() ..
 				"label[0,0;I'll need something from you.]" ..
 				"list[detached:trade_" .. self.tid .. ";exchange;3,1;2,1]" ..
 				"list[current_player;main;0,2.5;8,1]" ..
@@ -93,7 +134,7 @@ local function mob_detached_inv(self)
 				list[i] = list[i]:to_string()
 			end
 			self.inv = minetest.serialize(list)
-			return 0, minetest.show_formspec(name, "npc:npc_trade", trade_fs)
+			return 0, minetest.show_formspec(name, "mobs:npc_trade", trade_fs)
 		end,
 		on_move = function(inv, from_list, from_index, to_list, to_index, count, player)
 			return 0
@@ -221,6 +262,7 @@ mobs:register_mob("mobs:npc", {
 			minetest.show_formspec(name, "mobs:npc",
 				"size[8,8.85]" ..
 				jas0.exit_button(-0.1, -0.075) ..
+				jas0.help_button(-0.1, -0.075) ..
 				"label[0,0;What would you like?]" ..
 				"list[detached:npc_" .. self.tid .. ";trade;0,0.6.9;8,4]" ..
 				"list[current_player;main;0,4.79;8,1]" ..
