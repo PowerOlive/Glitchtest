@@ -100,7 +100,7 @@ local function mob_detached_inv(self)
 					local player_inv = p_player:get_inventory()
 					local y = player_inv:add_item("main", p_inv:get_stack("exchange", 1))
 					if y then
-						minetest.add_item(pos, y)
+						minetest.add_item(player:get_pos(), y)
 					end
 					if inv:room_for_item("trade", p_stack) then
 						inv:add_item("trade", p_stack)
