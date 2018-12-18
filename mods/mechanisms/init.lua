@@ -32,9 +32,11 @@ end
 
 function plate.timer(pos)
 	local objs = minetest.get_objects_inside_radius(pos, 0.8)
-	if objs == {} or not doors.get then return true end
-	local minp = {x=pos.x-2, y=pos.y, z=pos.z-2}
-	local maxp = {x=pos.x+2, y=pos.y, z=pos.z+2}
+	if objs == {} or not doors.get then
+		return true
+	end
+	local minp = {x = pos.x - 2, y = pos.y, z = pos.z - 2}
+	local maxp = {x = pos.x + 2, y = pos.y, z = pos.z + 2}
 	local doors = minetest.find_nodes_in_area(minp, maxp, "group:door")
 
 	for _, player in pairs(objs) do
