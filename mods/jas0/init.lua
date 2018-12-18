@@ -29,10 +29,11 @@ end)
 minetest.register_on_chat_message(function(name, message)
 	local players = minetest.get_connected_players()
 	for i = 1, #players do
-		local f = minetest.sound_play("walkie_blip", {
-			object = players[i],
+		--[[local f = ]]minetest.sound_play("walkie_blip", {
+			gain = 0.1,
+			pos = players[i]:get_pos(),
 		})
-		minetest.sound_fade(f, -5, 0.25)
+		--minetest.sound_fade(f, -5, 0.25)
 		minetest.chat_send_player(players[i]:get_player_name(),
 				minetest.colorize("red", "<") ..
 				name .. minetest.colorize("red", "> ") ..

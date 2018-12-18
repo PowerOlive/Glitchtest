@@ -8,33 +8,65 @@
 local random = math.random
 local S = mobs.intllib
 
-local price_guide = {}
-for k, v in pairs(minetest.registered_items) do
-	local c = v.groups.trade_value
-	if not c then
-		c = 1
-	end
-	price_guide[k] = c
-end
-local pg_s = ""
-for item, cost in pairs(price_guide) do
-	if item:match(":") then
-		item = minetest.registered_items[item].description
-		if item ~= "" then
-			if item:find("\n") then
-				item = item:gsub("[\n].*$", "")
-			elseif item:find(",") then
-				item = item:gsub(",", "\\,")
+local price_guide = {
+	["All Items"] = {},
+	--[[
+	["Gold"] = {},
+	["Mese"] = {},
+	["Diamond"] = {},
+	["Tools"] = {},
+	--]]
+}
+for name, def in pairs(minetest.registered_items) do
+	if name:match(":") then
+		name = def.description
+		if name ~= "" then
+			if name:find("\n") then
+				name = name:gsub("[\n].*$", "")
 			end
-			pg_s = pg_s .. item .. "," .. cost .. ","
+			if name:find(",") then
+				name = name:gsub(",", "\\,")
+			end
+			local cost = def.groups.trade_value
+			if not cost then
+				cost = 1
+			end
+			--[[
+			if name:match("[Gg]old") then
+				price_guide["Gold"][name] = cost
+			end
+			if name:match("[Mm]ese") then
+				price_guide["Mese"][name] = cost
+			end
+			if name:match("[Dd]iamond") then
+				price_guide["Diamond"][name] = cost
+			end
+			if def.groups.tool then
+				price_guide["Tools"][name] = cost
+			end
+			--]]
+			price_guide["All Items"][name] = cost
 		end
 	end
 end
-pg_s = pg_s:sub(1, -2)
-local pg_fs = "size[8,8]" ..
-	"tablecolumns[text,width=8;text,padding=1.0]" ..
+local pg_s = "#FFF,0,"
+for cat, items in pairs(price_guide) do
+	pg_s = pg_s .. cat .. ",,#FFF,1,"
+	for name, cost in pairs(items) do
+		pg_s = pg_s .. name .. "," ..
+				cost .. ",#FFF,1,"
+	end
+	pg_s = pg_s:sub(1, -3)
+	pg_s = pg_s .. "0,"
+end
+local pg_fs = "size[8.92,8.2]" ..
+	jas0.exit_button(0.82, -0.155) ..
+	"tablecolumns[color;tree;text,width=8;text,padding=1.0]" ..
 	--"tableoptions[]" ..
-	"table[0,0;7.8,8.1;pg;" .. pg_s .. ";1]" ..
+	"table[0,0.5;8.745,7.05;pg;" .. pg_s .. ";1]" ..
+	--ok button
+	"field[0.3,7.9;7,1;search;;]" ..
+	"button[6.9,7.58;2,1;search;Search]" ..
 ""
 
 mobs.npc_drops = {
@@ -46,7 +78,9 @@ mobs.npc_drops = {
 }
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-	if (formname == "mobs:npc" or formname == "mobs:npc_trade") and
+	if formname == "mobs:npc_trade_list" and fields.search then
+		print(fields.search)
+	elseif (formname == "mobs:npc" or formname == "mobs:npc_trade") and
 			fields.help then
 		minetest.show_formspec(player:get_player_name(), "mobs:npc_trade_list", pg_fs)
 	end
