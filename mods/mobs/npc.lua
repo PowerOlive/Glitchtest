@@ -109,7 +109,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local meta = m:get("local_price_guide")
 		local pg_rst = (meta or pg_s) .. st .. ",,#FFF,1,"
 		for iname, cost in pairs(price_guide["All Items"]) do
-			if iname:match(st) then
+			if iname:match(st) or
+					iname:match(st:gsub("^%l", string.upper)) then
 				local_price_guide[name][st][iname] = cost
 				pg_rst = pg_rst .. iname .. "," ..
 						cost .. ",#FFF,1,"
