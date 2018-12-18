@@ -7,7 +7,21 @@
 
 local random = math.random
 local S = mobs.intllib
-
+local local_price_guide = {}
+minetest.register_on_joinplayer(function(player)
+	minetest.after(0.334, function(p)
+		if not p then
+			return
+		end
+		local_price_guide[player:get_player_name()] = {}
+	end, player)
+end)
+minetest.register_on_leaveplayer(function(player)
+	if not player then
+		return
+	end
+	local_price_guide[player:get_player_name()] = nil
+end)
 local price_guide = {
 	["All Items"] = {},
 	--[[
@@ -59,15 +73,18 @@ for cat, items in pairs(price_guide) do
 	pg_s = pg_s:sub(1, -3)
 	pg_s = pg_s .. "0,"
 end
-local pg_fs = "size[8.92,8.2]" ..
-	jas0.exit_button(0.82, -0.155) ..
-	"tablecolumns[color;tree;text,width=8;text,padding=1.0]" ..
-	--"tableoptions[]" ..
-	"table[0,0.5;8.745,7.05;pg;" .. pg_s .. ";1]" ..
-	--ok button
-	"field[0.3,7.9;7,1;search;;]" ..
-	"button[6.9,7.58;2,1;search;Search]" ..
-""
+local pg_fs = function(pg_st)
+	return "size[8.92,8.2]" ..
+		"label[0,0;Type /clear to erase searches.]" ..
+		jas0.exit_button(0.82, -0.155) ..
+		"tablecolumns[color;tree;text,width=8;text,padding=1.0]" ..
+		--"tableoptions[]" ..
+		"table[0,0.5;8.745,7.05;pg;" .. pg_st .. ";1]" ..
+		"field[0.3,7.9;7,1;search;;]" ..
+		"field_close_on_enter;search;false]" ..
+		"button[6.9,7.58;2,1;ok;Search]" ..
+	""
+end
 
 mobs.npc_drops = {
 	"default:pick_steel", "default:apple 3", "default:sword_steel",
@@ -79,10 +96,38 @@ mobs.npc_drops = {
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if formname == "mobs:npc_trade_list" and fields.search then
-		print(fields.search)
+		local st = minetest.formspec_escape(fields.search)
+		if st == "" then
+			return
+		end
+		if st == "/clear" then
+			return player:get_meta():set_string("local_price_guide", "")
+		end
+		local name = player:get_player_name()
+		local_price_guide[name][st] = {}
+		local m = player:get_meta()
+		local meta = m:get("local_price_guide")
+		local pg_rst = (meta or pg_s) .. st .. ",,#FFF,1,"
+		for iname, cost in pairs(price_guide["All Items"]) do
+			if iname:match(st) then
+				local_price_guide[name][st][iname] = cost
+				pg_rst = pg_rst .. iname .. "," ..
+						cost .. ",#FFF,1,"
+			end
+		end
+		pg_rst = pg_rst:sub(1, -3)
+		pg_rst = pg_rst .. "0,"
+		m:set_string("local_price_guide", pg_rst)
+		minetest.show_formspec(name, "mobs:npc_trade_list", pg_fs(pg_rst))
 	elseif (formname == "mobs:npc" or formname == "mobs:npc_trade") and
 			fields.help then
-		minetest.show_formspec(player:get_player_name(), "mobs:npc_trade_list", pg_fs)
+		local m = player:get_meta():get("local_price_guide")
+		local n = player:get_player_name()
+		if m then
+			minetest.show_formspec(n, "mobs:npc_trade_list", pg_fs(m))
+		else
+			minetest.show_formspec(n, "mobs:npc_trade_list", pg_fs(pg_s))
+		end
 	end
 end)
 
