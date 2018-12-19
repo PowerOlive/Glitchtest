@@ -70,8 +70,8 @@ function plate.timer(pos)
 	if objs == {} then --or not doors.get then
 		return true
 	end
-	local minp = {x = pos.x - 2, y = pos.y, z = pos.z - 2}
-	local maxp = {x = pos.x + 2, y = pos.y, z = pos.z + 2}
+	local minp = {x = pos.x - 2, y = pos.y - 2, z = pos.z - 2}
+	local maxp = {x = pos.x + 2, y = pos.y + 2, z = pos.z + 2}
 	local doors = minetest.find_nodes_in_area(minp, maxp, {"group:door", "group:actuator"})
 
 	for _, player in pairs(objs) do
@@ -150,8 +150,8 @@ minetest.register_node("mechanisms:lever_off", {
 			return
 		end
 		--]]
-		local minp = {x=pos.x-2, y=pos.y-1, z=pos.z-2}
-		local maxp = {x=pos.x+2, y=pos.y+1, z=pos.z+2}
+		local minp = {x = pos.x - 2, y = pos.y - 2, z=pos.z - 2}
+		local maxp = {x = pos.x + 2, y = pos.y + 2, z=pos.z + 2}
 		local doors = minetest.find_nodes_in_area(minp, maxp, {"group:door", "group:actuator"})
 
 		for i = 1, #doors do
