@@ -69,13 +69,15 @@ minetest.register_on_respawnplayer(function(player)
 	end)
 	local inv = player:get_inventory()
 	if meta:get("class") == "node" then
-		inv:set_stack("main", 1, meta:get("node") or "default:dirt")
+		inv:set_stack("main", 1, meta:get("node") or
+				"default:dirt")
 		return
 	end
 	local p = meta:get("death_location")
 	if p then
 		local ii = ItemStack("default:paper")
-		ii:get_meta():set_string("description", "Died at " .. p)
+		ii:get_meta():set_string("description",
+				"Died at " .. p)
 		inv:add_item("main", ItemStack(ii))
 	end
 	inv:add_item("main", "walkie:talkie")

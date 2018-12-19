@@ -44,7 +44,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		is:get_meta():set_string("description", fields.text)
 		player:set_wielded_item(is)
 		if count > 1 then
-			local iii = player:get_inventory():add_item("main", "default:paper " .. tostring(count - 1))
+			local iii = player:get_inventory():add_item("main",
+					"default:paper " .. tostring(count - 1))
 			if iii then
 				minetest.add_item(player:get_pos(), iii)
 			end
@@ -67,7 +68,7 @@ local function paper_displayer(player)
 			player:hud_remove(paper_display[name])
 			paper_display[name] = nil
 		end
-		return minetest.after(0.1, paper_displayer, player)
+		return minetest.after(0.15, paper_displayer, player)
 	end
 	local hd = {
 		hud_elem_type = "text",
@@ -79,15 +80,15 @@ local function paper_displayer(player)
 	}
 	if not paper_display[name] then
 		paper_display[name] = player:hud_add(hd)
-		return minetest.after(0.1, paper_displayer, player)
+		return minetest.after(0.15, paper_displayer, player)
 	end
 	player:hud_change(paper_display[name],
 			"text", text)
-	minetest.after(0.1, paper_displayer, player)
+	minetest.after(0.15, paper_displayer, player)
 end
 minetest.register_on_joinplayer(function(player)
 	if not player then
 		return
 	end
-	minetest.after(0.1, paper_displayer, player)
+	minetest.after(0.15, paper_displayer, player)
 end)
