@@ -240,7 +240,12 @@ minetest.register_node("walkie:intercomm", {
 		wall_bottom = {-0.4375, -0.5, -0.3125, 0.4375, -0.4375, 0.3125},
 		wall_side   = {-0.5, -0.375, -0.4375, -0.4375, 0.375, 0.4375},
 	},
-	groups = {cracky = 3, oddly_breakable_by_hand = 1, attached_node = 1, actuator = 2},
+	groups = {
+		cracky = 3,
+		oddly_breakable_by_hand = 1,
+		attached_node = 1,
+		actuator = 2
+	},
 	legacy_wallmounted = true,
 	sounds = {
 		footstep = {name = "default_hard_footstep", gain = 0.5},

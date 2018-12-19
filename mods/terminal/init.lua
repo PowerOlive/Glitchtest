@@ -149,7 +149,9 @@ terminal.display = function(source, user, pos, input)
 	elseif command == "list" then
 		if args[2] and args[2] == "warps" then
 			if not args[3] then
-				output = "`public' or `private'"
+				command = "warps list"
+				output = "list warps <public|private>"
+				feedback = "`public' or `private'"
 			elseif args[3] == "private" then
 				local beds = beds.beds[name]
 				for k, v in pairs(beds) do
@@ -157,16 +159,17 @@ terminal.display = function(source, user, pos, input)
 				end
 				output = output:sub(1, -3)
 			elseif args[3] == "public" then
-				local pub_beds = beds.beds_public
-				for k, v in pairs(pub_beds) do
-					for kk, vv in pairs(v) do
-						output = output .. kk .. ", "
-						output = output:sub(1, -3)
+				for name, warps in pairs(beds.beds_public) do
+					output = output .. name .. ": "
+					for w_name, _ in pairs(warps) do
+						output = output .. w_name .. ", "
 					end
+					output = output:sub(1, -3) .. "\n"
 				end
 			end
+		else
+			feedback = "List `warps', ..."
 		end
-		feedback = "List `warps', ..."
 	elseif command == "name" then
 		command = input
 		local args = args[2]
