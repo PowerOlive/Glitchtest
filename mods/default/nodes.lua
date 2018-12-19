@@ -549,15 +549,55 @@ minetest.register_node("default:silver_sand", {
 minetest.register_node("default:gravel", {
 	description = "Gravel",
 	tiles = {"default_gravel.png"},
-	groups = {crumbly = 2, falling_node = 1},
+	groups = {
+		crumbly = 2,
+		falling_node = 1,
+		trade_value = 2,
+		oddly_breakable_by_hand = 2,
+	},
 	sounds = default.node_sound_gravel_defaults(),
 	drop = {
-		max_items = 1,
+		max_items = 2,
 		items = {
-			{items = {'default:flint'}, rarity = 16},
-			{items = {'default:gravel'}}
-		}
-	}
+			{
+				items = {
+					"default:diamond",
+				},
+				rarity = 99,
+			},
+			{
+				items = {
+					"default:iron_lump",
+				},
+				rarity = 19,
+			},
+			{
+				items = {
+					"default:tin_lump",
+				},
+				rarity = 13,
+			},
+			{
+				items = {
+					"default:coal_lump",
+				},
+				rarity = 9,
+			},
+			{
+				items = {
+					"default:gravel",
+				},
+				rarity = 2,
+			},
+			{
+				items = {
+					"default:flint",
+				},
+				rarity = 15,
+			},
+
+		},
+	},
 })
 
 minetest.register_node("default:clay", {
