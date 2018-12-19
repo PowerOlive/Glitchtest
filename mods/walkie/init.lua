@@ -240,7 +240,7 @@ minetest.register_node("walkie:intercomm", {
 		wall_bottom = {-0.4375, -0.5, -0.3125, 0.4375, -0.4375, 0.3125},
 		wall_side   = {-0.5, -0.375, -0.4375, -0.4375, 0.375, 0.4375},
 	},
-	groups = {cracky = 3, oddly_breakable_by_hand = 1, attached_node = 1},
+	groups = {cracky = 3, oddly_breakable_by_hand = 1, attached_node = 1, actuator = 2},
 	legacy_wallmounted = true,
 	sounds = {
 		footstep = {name = "default_hard_footstep", gain = 0.5},
@@ -250,7 +250,11 @@ minetest.register_node("walkie:intercomm", {
 		place_failed = {name = "walkie_blip", gain = 1.0}
 	},
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
-		terminal.display("node", clicker)
+		terminal.display("node", clicker, pos)
+	end,
+	_on_function = function(pos)
+		local args = minetest.deserialize(minetest.get_meta(pos):get_string("_on_function"))
+		return args
 	end,
 })
 

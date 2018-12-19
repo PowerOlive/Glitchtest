@@ -62,6 +62,11 @@ terminal.display = function(source, user, pos, input)
 		command = "Yes Master?"
 		output = ""
 		feedback = ""
+	elseif command == "f" and source == "node" then
+		local nnn = minetest.get_node_or_nil(pos)
+		if nnn and nnn.name == "walkie:intercomm" then
+			meta:set_string("_on_function", minetest.serialize(args))
+		end
 	elseif command == "+" then
 		local new_args = {}
 		for i = 2, #args do
@@ -101,10 +106,8 @@ terminal.display = function(source, user, pos, input)
 	elseif command == "channel" then
 		local ch = tonumber(args[2])
 		if type(ch) == "number" then
-			--dcbl.channels[name].channel = ch
 		end
-		--feedback = "You are on channel " .. tostring(dcbl.channels[name].channel)
-		feedback = "TODO: Implement chat channels."
+		feedback = ""
 	elseif command == "echo" then
 		if type(args[2]) == "string" then
 			for i = 2, #args do
@@ -144,20 +147,6 @@ terminal.display = function(source, user, pos, input)
 		output = minetest.formspec_escape(info)
 		feedback = ""
 	elseif command == "list" then
-		--[[
-		local chatters = ""
-		for _, player in pairs(minetest.get_connected_players()) do
-			if player:get_inventory():contains_item("main", "walkie:talkie") then
-				chatters = chatters .. player:get_player_name() .. " "
-			end
-		end
-		if chatters == "" then
-			output = "No one seems to have a walkie talkie."
-		else
-			output = chatters
-		end
-		feedback = "Players on channel 1 or near intercomm listed."
-		--]]
 		if args[2] and args[2] == "warps" then
 			if not args[3] then
 				output = "`public' or `private'"
@@ -198,25 +187,6 @@ terminal.display = function(source, user, pos, input)
 		end
 		feedback = ""
 	elseif command == "set" then
-		--[[
-		if args[2] == "warp" then
-			local pt_under = meta:get_string("pt_under")
-			if not pt_under or pt_under == "" then
-				return
-			end
-			if not args[3] then
-				return
-			end
-			local nn = minetest.string_to_pos(pt_under)
-			if minetest.get_node(nn).name ~= "warps:warpgoo_amethyst" or
-					minetest.is_protected(nn, name) then
-				return
-			end
-			minetest.get_meta(nn):set_string("warps_destination", args[3])
-			meta:set_string("pt_under", nil)
-			feedback = "TODO"
-		end
-		--]]
 		if args[2] and args[2] == "spawn_switch" then
 			local pm = user:get_meta()
 			local ss = pm:get_int("spawn_switch")
@@ -315,24 +285,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	source = s[source]
 	terminal.display(source, player, pos, fields.input)
 end)
--- TODO Make hide_chat setting.  Send all chat to walkie mod.
--- 	But make setting hide top-left chat in present.
---[[
-minetest.register_on_chat_message(function(name, message)
-	local player = minetest.get_player_by_name(name)
-	if not player then
-		return
-	end
-	local pp = {}
-	for _, p in ipairs(minetest.get_connected_players()) do
-		local n = p:get_player_name()
-		pp[n] = {}
-		print(#pp[n])
-	end
-	terminal.display("mod", player, player:get_pos(), "say " .. message)
-	return true
-end)
---]]
+
 minetest.register_privilege("terminal", {
 	description = "Can use /terminal command",
 	give_to_singleplayer = false,
