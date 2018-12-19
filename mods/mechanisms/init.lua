@@ -41,6 +41,15 @@ local function door_toggle(pos_actuator, pos_door, player)
 					local warp = beds.beds[player:get_player_name()][f[i + 1]]
 					if warp then
 						player:set_pos(warp)
+					else
+						for p, w in pairs(beds.beds_public) do
+							for n, pos in pairs(w) do
+								if n == f[i + 1] then
+									player:set_pos(pos)
+									return
+								end
+							end
+						end
 					end
 				end
 			end
