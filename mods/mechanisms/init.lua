@@ -38,7 +38,10 @@ local function door_toggle(pos_actuator, pos_door, player)
 				local word = f[i]
 				-- TODO check against terminal.commands[f]
 				if word == "warp" then
-					local warp = beds.beds[player:get_player_name()][f[i + 1]]
+					local warp = beds.beds[player:get_player_name()]
+					if warp then
+						warp = warp[f[i + 1]]
+					end
 					if warp then
 						player:set_pos(warp)
 					else
