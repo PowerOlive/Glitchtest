@@ -93,22 +93,42 @@ minetest.override_item("default:gravel", {
 	items = {
 		{
 			items = {
+				"default:diamond",
+			},
+			rarity = 99,
+		},
+		{
+			items = {
 				"default:iron_lump",
 			},
-			rarity = 9,
+			rarity = 19,
+		},
+		{
+			items = {
+				"default:tin_lump",
+			},
+			rarity = 13
 		},
 		{
 			items = {
 				"default:coal_lump",
 			},
-			rarity = 3,
+			rarity = 9,
 		},
 		{
 			items = {
 				"default:gravel",
 			},
-			rarity = 2,
+			rarity = 5,
 		},
+		{
+			items = {
+				"default:gravel",
+				"default:gravel",
+			},
+			rarity = 7,
+		},
+
 	},
 }})
 minetest.override_item("bones:bones", {
