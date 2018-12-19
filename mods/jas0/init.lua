@@ -87,6 +87,30 @@ minetest.register_on_respawnplayer(function(player)
 end)
 
 -- OVERRIDES
+minetest.override_item("default:gravel", {
+	drop = {
+		max_items = 2,
+	items = {
+		{
+			items = {
+				"default:iron_lump",
+			},
+			rarity = 9,
+		},
+		{
+			items = {
+				"default:coal_lump",
+			},
+			rarity = 3,
+		},
+		{
+			items = {
+				"default:gravel",
+			},
+			rarity = 2,
+		},
+	},
+}})
 minetest.override_item("bones:bones", {
 	on_use = minetest.item_eat(1)
 })
