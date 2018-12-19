@@ -69,7 +69,7 @@ minetest.register_on_respawnplayer(function(player)
 	end)
 	local inv = player:get_inventory()
 	if meta:get("class") == "node" then
-		inv:add_item("main", meta:get("node"))
+		inv:set_stack("main", 1, meta:get("node") or "default:dirt")
 		return
 	end
 	local p = meta:get("death_location")

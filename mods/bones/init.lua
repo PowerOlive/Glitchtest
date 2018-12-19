@@ -183,6 +183,15 @@ minetest.register_on_dieplayer(function(player)
 	if not player then
 		return
 	end
+	local m = player:get_meta()
+	if not m then
+		return
+	end
+	local player_inv = player:get_inventory()
+	if m:get("class") == "node" then
+		player_inv:set_list("main", {})
+		return
+	end
 	-- TODO FIXME Don't kill dead players?
 	local bones_mode = minetest.settings:get("bones_mode") or "bones"
 	if bones_mode ~= "bones" and bones_mode ~= "drop" and bones_mode ~= "keep" then
@@ -205,7 +214,6 @@ minetest.register_on_dieplayer(function(player)
 		return
 	end
 
-	local player_inv = player:get_inventory()
 	if is_all_empty(player_inv) then
 		minetest.log("action", player_name .. " dies at " .. pos_string ..
 			". No bones placed")
