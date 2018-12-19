@@ -64,13 +64,15 @@ local on_punch = function(pos, node, puncher, pointed_thing)
 						meta:set_string("state", "")
 						player:set_pos(warp)
 						warp.y = warp.y + 2
-						jas0.message(player, "Warped to " .. meta:get_string("destination") .. ".")
+						jas0.message(player, "Warped to "
+								.. meta:get_string("destination") .. ".")
 						return minetest.sound_play("sneak_jump_item",
 								{pos = warp, max_hear_distance = 64})
 					end
 					minetest.after(0.334, timer, p, player, time + 0.334, meta, sid, warp)
 				else
-					jas0.message(puncher, "Stand still for 5 seconds after punching to warp.")
+					jas0.message(puncher,
+							"Stand still for 5 seconds after punching to warp.")
 					minetest.sound_fade(sid, -0.89, 0)
 					meta:set_string("state", "")
 					return
