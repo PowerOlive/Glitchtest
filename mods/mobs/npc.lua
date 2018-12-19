@@ -87,11 +87,14 @@ local pg_fs = function(pg_st)
 end
 
 mobs.npc_drops = {
-	"default:pick_steel", "default:apple 3", "default:sword_steel",
+	"default:pick_steel", "default:sword_steel", "default:coral_skeleton",
 	"default:shovel_steel", "farming:bread", "fireflies:bug_net",
 	"walkie:talkie", "craftguide:book", "default:book",
 	"mobs:shears", "default:axe_steel", "default:mese_crystal_fragment",
-	"default:papyrus",
+	"default:papyrus", "default:blueberries", "default:cactus",
+	"default:dry_shrub", "default:fern_3", "default:blueberry_bush_sapling",
+	"default:coral_green", "dye:red", "wool:white",
+	"wool:red", "wool:green", "default:bronze_ingot",
 }
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
@@ -308,11 +311,12 @@ mobs:register_mob("mobs:npc", {
 
 			}
 			for i = random(1, 2), #mobs.npc_drops, 2 do
-				table.insert(ls, mobs.npc_drops[i])
+				table.insert(ls, mobs.npc_drops[i] ..
+					" " .. random(1, 9))
 			end
 			local d_loot = dungeon_loot.registered_loot
 			local c = d_loot.count or {1, 2}
-			for i = random(1, random(2, 3)), #d_loot, 2 do
+			for i = random(1, 3), #d_loot, random(1, 2) do
 				if d_loot[i].chance > random() then
 					table.insert(ls,
 							d_loot[i].name .. " " ..

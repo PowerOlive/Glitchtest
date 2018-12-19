@@ -1331,7 +1331,13 @@ minetest.register_node("default:junglegrass", {
 	sunlight_propagates = true,
 	walkable = false,
 	buildable_to = true,
-	groups = {snappy = 3, flora = 1, attached_node = 1, flammable = 1},
+	groups = {
+		snappy = 3,
+		flora = 1,
+		attached_node = 1,
+		flammable = 1,
+		trade_value = 2,
+	},
 	sounds = default.node_sound_leaves_defaults(),
 	selection_box = {
 		type = "fixed",
@@ -1677,7 +1683,7 @@ minetest.register_node("default:blueberry_bush_sapling", {
 		fixed = {-4 / 16, -0.5, -4 / 16, 4 / 16, 2 / 16, 4 / 16}
 	},
 	groups = {snappy = 2, dig_immediate = 3, flammable = 2,
-		attached_node = 1, sapling = 1},
+		attached_node = 1, sapling = 1, trade_value = 3,},
 	sounds = default.node_sound_leaves_defaults(),
 
 	on_construct = function(pos)
@@ -1919,7 +1925,7 @@ minetest.register_node("default:coral_green", {
 	tiles = {"default_coral_skeleton.png"},
 	special_tiles = {{name = "default_coral_green.png", tileable_vertical = true}},
 	inventory_image = "default_coral_green.png",
-	groups = {snappy = 3},
+	groups = {snappy = 3, trade_value = 5,},
 	selection_box = {
 		type = "fixed",
 		fixed = {
@@ -2083,7 +2089,7 @@ minetest.register_node("default:coral_orange", {
 minetest.register_node("default:coral_skeleton", {
 	description = "Coral Skeleton",
 	tiles = {"default_coral_skeleton.png"},
-	groups = {cracky = 3},
+	groups = {cracky = 3, trade_value = 3,},
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -2707,7 +2713,12 @@ for i = 1, #dye.dyes do
 		paramtype2 = "glasslikeliquidlevel",
 		sunlight_propagates = true,
 		is_ground_content = false,
-		groups = {cracky = 3, glass = 1, oddly_breakable_by_hand = 3},
+		groups = {
+			cracky = 3,
+			glass = 1,
+			oddly_breakable_by_hand = 3,
+			trade_value = 2,
+		},
 		sounds = default.node_sound_glass_defaults(),
 	})
 	minetest.register_craft({
@@ -2736,7 +2747,7 @@ minetest.register_node("default:brick", {
 	place_param2 = 0,
 	tiles = {"default_brick.png"},
 	is_ground_content = false,
-	groups = {cracky = 3},
+	groups = {cracky = 3, trade_value = 2,},
 	sounds = default.node_sound_stone_defaults(),
 })
 
@@ -2748,7 +2759,7 @@ minetest.register_node("default:meselamp", {
 	paramtype = "light",
 	sunlight_propagates = true,
 	is_ground_content = false,
-	groups = {cracky = 3, oddly_breakable_by_hand = 3},
+	groups = {cracky = 3, oddly_breakable_by_hand = 3, trade_value = 9,},
 	sounds = default.node_sound_glass_defaults(),
 	light_source = default.LIGHT_MAX,
 })
@@ -2770,7 +2781,12 @@ minetest.register_node("default:mese_post_light", {
 	light_source = default.LIGHT_MAX,
 	sunlight_propagates = true,
 	is_ground_content = false,
-	groups = {choppy = 2, oddly_breakable_by_hand = 2, flammable = 2},
+	groups = {
+		choppy = 2,
+		oddly_breakable_by_hand = 2,
+		flammable = 2,
+		trade_value = 9,
+	},
 	sounds = default.node_sound_wood_defaults(),
 })
 
