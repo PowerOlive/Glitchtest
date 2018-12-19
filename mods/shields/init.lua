@@ -29,6 +29,27 @@ if minetest.global_exists("armor") and armor.elements then
 	local mult = armor.config.level_multiplier or 1
 	armor.config.level_multiplier = mult * 0.9
 end
+local on_use = function(itemstack, user, pointed_thing)
+	local name = user:get_player_name()
+	local inv = minetest.get_inventory({type = "detached",
+			name = name .. "_armor"})
+	local list = inv:get_list("armor")
+	local index = 0
+	for i = 1, #list do
+		if list[i]:get_name() == "" then
+			inv:set_stack("armor", i, itemstack)
+			index = i
+			break
+		end
+	end
+	if index == 0 then
+		return itemstack
+	end
+	armor:save_armor_inventory(user)
+	armor:run_callbacks("on_equip", user, index, itemstack)
+	armor:set_player_armor(user)
+	return ""
+end
 
 -- Regisiter Shields
 --[[
@@ -48,6 +69,7 @@ if armor.materials.wood then
 		armor_groups = {fleshy=5},
 		damage_groups = {cracky=3, snappy=2, choppy=3, crumbly=2, level=1},
 		reciprocate_damage = true,
+		on_use = on_use,
 		on_damage = function(player, index, stack)
 			play_sound_effect(player, "default_wood_footstep")
 		end,
@@ -62,6 +84,7 @@ if armor.materials.wood then
 		armor_groups = {fleshy=8},
 		damage_groups = {cracky=3, snappy=2, choppy=3, crumbly=2, level=2},
 		reciprocate_damage = true,
+		on_use = on_use,
 		on_damage = function(player, index, stack)
 			play_sound_effect(player, "default_dig_metal")
 		end,
@@ -87,6 +110,7 @@ if armor.materials.cactus then
 		armor_groups = {fleshy=5},
 		damage_groups = {cracky=3, snappy=3, choppy=2, crumbly=2, level=1},
 		reciprocate_damage = true,
+		on_use = on_use,
 		on_damage = function(player, index, stack)
 			play_sound_effect(player, "default_wood_footstep")
 		end,
@@ -101,6 +125,7 @@ if armor.materials.cactus then
 		armor_groups = {fleshy=8},
 		damage_groups = {cracky=3, snappy=3, choppy=2, crumbly=2, level=2},
 		reciprocate_damage = true,
+		on_use = on_use,
 		on_damage = function(player, index, stack)
 			play_sound_effect(player, "default_dig_metal")
 		end,
@@ -127,6 +152,7 @@ if armor.materials.steel then
 		armor_groups = {fleshy=10},
 		damage_groups = {cracky=2, snappy=3, choppy=2, crumbly=1, level=2},
 		reciprocate_damage = true,
+		on_use = on_use,
 		on_damage = function(player, index, stack)
 			play_sound_effect(player, "default_dig_metal")
 		end,
@@ -145,6 +171,7 @@ if armor.materials.bronze then
 		armor_groups = {fleshy=10},
 		damage_groups = {cracky=2, snappy=3, choppy=2, crumbly=1, level=2},
 		reciprocate_damage = true,
+		on_use = on_use,
 		on_damage = function(player, index, stack)
 			play_sound_effect(player, "default_dig_metal")
 		end,
@@ -162,6 +189,7 @@ if armor.materials.diamond then
 		armor_groups = {fleshy=15},
 		damage_groups = {cracky=2, snappy=1, choppy=1, level=3},
 		reciprocate_damage = true,
+		on_use = on_use,
 		on_damage = function(player, index, stack)
 			play_sound_effect(player, "default_glass_footstep")
 		end,
@@ -180,6 +208,7 @@ if armor.materials.gold then
 		armor_groups = {fleshy=10},
 		damage_groups = {cracky=1, snappy=2, choppy=2, crumbly=3, level=2},
 		reciprocate_damage = true,
+		on_use = on_use,
 		on_damage = function(player, index, stack)
 			play_sound_effect(player, "default_dig_metal")
 		end,
@@ -197,6 +226,7 @@ if armor.materials.mithril then
 		armor_groups = {fleshy=15},
 		damage_groups = {cracky=2, snappy=1, level=3},
 		reciprocate_damage = true,
+		on_use = on_use,
 		on_damage = function(player, index, stack)
 			play_sound_effect(player, "default_glass_footstep")
 		end,
@@ -214,6 +244,7 @@ if armor.materials.crystal then
 		armor_groups = {fleshy=15},
 		damage_groups = {cracky=2, snappy=1, level=3},
 		reciprocate_damage = true,
+		on_use = on_use,
 		on_damage = function(player, index, stack)
 			play_sound_effect(player, "default_glass_footstep")
 		end,
