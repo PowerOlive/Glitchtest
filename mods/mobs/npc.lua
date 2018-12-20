@@ -89,7 +89,7 @@ end
 npc_drops = {
 	"default:pick_steel", "default:sword_steel", "default:coral_skeleton",
 	"default:shovel_steel", "farming:bread", "fireflies:bug_net",
-	"walkie:talkie", "craftguide:book", "default:book",
+	"default:gravel", "craftguide:book", "default:book",
 	"mobs:shears", "default:axe_steel", "default:mese_crystal_fragment",
 	"default:papyrus", "default:blueberries", "default:cactus",
 	"default:dry_shrub", "default:fern_3", "default:blueberry_bush_sapling",
