@@ -789,10 +789,10 @@ local do_jump = function(self)
 					})
 				end
 			end, self, v)
-
+			--[[
 			if get_velocity(self) > 0 then
 				mob_sound(self, self.sounds.jump)
-			end
+			end]]
 		else
 			self.facing_fence = true
 		end
