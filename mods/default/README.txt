@@ -18,6 +18,11 @@ celeron55, Perttu Ahola <celeron55@gmail.com> (CC BY-SA 3.0)
 
 Textures
 --------
+jas' awesome Gravel texture
+made with a composite of old and
+new gravel/cobble textures!
+cc by-sa 4.0
+
 Cisoun's texture pack (CC BY-SA 3.0):
   default_jungletree.png
   default_lava.png
