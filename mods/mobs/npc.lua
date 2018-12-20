@@ -86,7 +86,7 @@ local pg_fs = function(pg_st)
 	""
 end
 
-mobs.npc_drops = {
+npc_drops = {
 	"default:pick_steel", "default:sword_steel", "default:coral_skeleton",
 	"default:shovel_steel", "farming:bread", "fireflies:bug_net",
 	"walkie:talkie", "craftguide:book", "default:book",
@@ -199,7 +199,9 @@ local function mob_detached_inv(self)
 					end
 					self.inv = minetest.serialize(list)
 					p_inv:set_list("exchange", {})
-					jas0.message(name, "Thank you for your patronage!", true)
+					jas0.message(name,
+							"Thank you for your patronage!",
+							true)
 
 					return -1
 				end,
@@ -210,7 +212,8 @@ local function mob_detached_inv(self)
 				jas0.exit_button() ..
 				jas0.help_button() ..
 				"label[0,0;I'll need something from you.]" ..
-				"list[detached:trade_" .. self.tid .. ";exchange;3,1;2,1]" ..
+				"list[detached:trade_" .. self.tid ..
+						";exchange;3,1;2,1]" ..
 				"list[current_player;main;0,2.5;8,1]" ..
 				"list[current_player;main;0,3.6;8,3;8]" ..
 				default.get_hotbar_bg(0, 2.5) ..
@@ -310,9 +313,9 @@ mobs:register_mob("mobs:npc", {
 				"dresser:skin_" .. dresser.skins[random(#dresser.skins)][1],
 
 			}
-			for i = random(1, 2), #mobs.npc_drops, 2 do
-				table.insert(ls, mobs.npc_drops[i] ..
-					" " .. random(1, 9))
+			for i = random(1, 2), #npc_drops, 2 do
+				table.insert(ls, npc_drops[i] ..
+					" " .. random(1, random(9, 36)))
 			end
 			local d_loot = dungeon_loot.registered_loot
 			local c = d_loot.count or {1, 2}
