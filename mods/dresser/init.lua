@@ -129,7 +129,12 @@ minetest.register_node("dresser:dresser", {
 		"dresser_dresser.png",
 	},
 	sounds = default.node_sound_wood_defaults(),
-	groups = {choppy = 3, flammable = 3},
+	groups = {
+		choppy = 3,
+		flammable = 3,
+		oddly_breakable_by_hand = 2,
+		trade_value = 5,
+	},
 	on_construct = function(pos)
 		minetest.get_meta(pos):set_string("infotext", "Dresser")
 	end,
