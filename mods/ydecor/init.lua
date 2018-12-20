@@ -18,6 +18,25 @@ stairs.register_stair_and_slab("coalstone", "ydecor:coalstone_tile",
 	default.node_sound_stone_defaults(),
 	false)
 
+-- Cactus Brick
+minetest.register_node("ydecor:cactusbrick", {
+	description = "Cactus Brick",
+	tiles = {"ydecor_cactusbrick.png"},
+	grounds = {cracky = 1,},
+	sounds = default.node_sound_stone_defaults(),
+})
+minetest.register_craft({
+	output = "ydecor:cactusbrick",
+	recipe = {
+		{"default:brick", "default:cactus"},
+	},
+})
+stairs.register_stair_and_slab("cactusbrick", "ydecor:cactusbrick",
+	{cracky = 1}, {"ydecor_cactusbrick.png"},
+	"Cactus Brick Stair", "Cactus Brick Slab",
+	default.node_sound_stone_defaults(),
+	false)
+
 -- Moon Brick
 minetest.register_node("ydecor:moonbrick", {
 	description = "Moon Brick",
