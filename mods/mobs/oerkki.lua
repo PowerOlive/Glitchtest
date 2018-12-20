@@ -21,6 +21,10 @@ mobs:register_mob("mobs:oerkki", {
 	makes_footstep_sound = false,
 	sounds = {
 		random = "mobs_oerkki",
+		damage = "mobs_oerkki",
+		death = "mobs_oerkki",
+		war_cry = "mobs_oerkki",
+		attack = "mobs_oerkki",
 	},
 	walk_velocity = 1,
 	run_velocity = 1,
