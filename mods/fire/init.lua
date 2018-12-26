@@ -52,7 +52,7 @@ minetest.register_node("fire:basic_flame", {
 
 	on_timer = function(pos)
 		local f = minetest.find_node_near(pos, 1, {"group:flammable"})
-		if not f then
+		if not f or protected(pos) then
 			minetest.remove_node(pos)
 			return
 		end
@@ -322,11 +322,8 @@ minetest.register_abm({
 	chance = 18,
 	catch_up = false,
 	action = function(pos, node, active_object_count, active_object_count_wider)
-		if protected(pos) then
-			return
-		end
 		local p = minetest.find_node_near(pos, 1, {"group:flammable"})
-		if p then
+		if p and not protected(p) then
 			local flammable_node = minetest.get_node(p)
 			local def = minetest.registered_nodes[flammable_node.name]
 			if def.on_burn then
@@ -335,6 +332,8 @@ minetest.register_abm({
 				minetest.remove_node(p)
 				minetest.check_for_falling(p)
 			end
+		elseif not p then
+			minetest.remove_node(pos)
 		end
 	end,
 })
