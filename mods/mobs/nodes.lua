@@ -86,7 +86,7 @@ minetest.register_node("mobs:spawner", {
 				z = pos.z + ceil(colbox[6]),
 			}
 			local _, s = minetest.find_nodes_in_area(p1, p2, "air", true)
-			if s["air"] < 19 then
+			if s["air"] < 12 then
 				return minetest.set_node(pos, {name = "air"})
 			end
 			local spawn_pos = {
