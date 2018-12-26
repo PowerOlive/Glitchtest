@@ -1,2 +1,12 @@
-Make backpacks explode contents.
-Learn Blender
+Make sure backpacks explode contents.
+
+Raise the statbar values such that < some small number doesn't
+show as 0, but 1.
+
+Fix models reseting when holding walkie, and possibly other items.
+It's likely due to wieldview.
+
+Check that last item on public warp list upon deletion updates index.
+
+Sort minetest.conf and minetest.conf.example, setting defaults back
+to the source file.
