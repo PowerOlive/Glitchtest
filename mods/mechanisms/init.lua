@@ -54,6 +54,8 @@ local function door_toggle(pos_actuator, pos_door, player)
 							end
 						end
 					end
+				elseif word == "boom" then
+					tnt.boom(player:get_pos())
 				end
 			end
 		end
