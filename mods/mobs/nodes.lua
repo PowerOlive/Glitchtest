@@ -53,7 +53,8 @@ minetest.register_node("mobs:spawner", {
 			local night = tod > 19000 or tod < 06000
 			local protection = minetest.find_node_near(pos, 13,
 					{"protector:protect", "protector:protect2"}, true)
-			if not protection and (biome == "underground" or night) then
+			if not protection and (biome == "underground" or night) and
+						minetest.get_node_light(pos) < 6 then
 				local mobs_to_insert = {
 					"mobs:dungeon_master",
 					"mobs:oerkki",
