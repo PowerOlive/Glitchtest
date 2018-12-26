@@ -2,8 +2,8 @@
 
 fire = {}
 
-local fire_enabled = function(pos)
-	return not minetest.is_protected(pos, "")
+local protected = function(pos)
+	return minetest.is_protected(pos, "")
 end
 
 --
@@ -52,7 +52,7 @@ minetest.register_node("fire:basic_flame", {
 
 	on_timer = function(pos)
 		local f = minetest.find_node_near(pos, 1, {"group:flammable"})
-		if not fire_enabled(pos) or not f then
+		if not f then
 			minetest.remove_node(pos)
 			return
 		end
@@ -322,6 +322,9 @@ minetest.register_abm({
 	chance = 18,
 	catch_up = false,
 	action = function(pos, node, active_object_count, active_object_count_wider)
+		if protected(pos) then
+			return
+		end
 		local p = minetest.find_node_near(pos, 1, {"group:flammable"})
 		if p then
 			local flammable_node = minetest.get_node(p)
