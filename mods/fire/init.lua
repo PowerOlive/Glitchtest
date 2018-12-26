@@ -16,12 +16,19 @@ end
 
 -- Flood flame function
 local function on_punch(pos, node, puncher, pointed_thing)
-	if puncher:get_wielded_item():get_name() == "default:mese_crystal" then
+	local w = puncher:get_wielded_item()
+	if w:get_name() == "default:mese_crystal" then
 		local n = minetest.find_node_near(pos, 1, {"fire:basic_flame"})
 		if n then
 			minetest.set_node(n, {name = "fire:antiflame"})
 		end
 		minetest.set_node(pointed_thing.under, {name = "fire:antiflame"})
+		local s = w:take_item()
+		if not s then
+			puncher:set_wielded_item("")
+		else
+			puncher:set_wielded_item(w)
+		end
 	end
 end
 
