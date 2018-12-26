@@ -27,7 +27,7 @@ minetest.register_node("mobs:spawner", {
 			if #immediate_surrounding > 0 then
 				return minetest.set_node(pos, {name = "air"})
 			end
-			local surrounding = minetest.get_objects_inside_radius(pos, 16)
+			local surrounding = minetest.get_objects_inside_radius(pos, 32)
 			if #surrounding > 6 then
 				local h = 0
 				for i = 1, #surrounding do
@@ -92,11 +92,12 @@ minetest.register_node("mobs:spawner", {
 				z = spawn_pos.z + colbox[6],
 			}
 			local d = vector.distance(p1, p2) * 3.14
-			local _, s = minetest.find_nodes_in_area(p1, p2, "air", true)
+			local r, s = minetest.find_nodes_in_area(p1, p2, "air", true)
 			if s["air"] < d then
 				return minetest.set_node(pos, {name = "air"})
 			end
 			minetest.add_entity(spawn_pos, mob)
+			minetest.set_node(r[random(#r)], {name = "mobs:spawner"})
 			return minetest.set_node(pos, {name = "air"})
 		else
 			minetest.get_node_timer(pos):set(elapsed + 1, elapsed)
