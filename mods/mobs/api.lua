@@ -2928,7 +2928,7 @@ local mob_step = function(self, dtime)
 	runaway_from(self)
 	local stepper = self.stepper or random()
 	self.stepper = stepper + dtime
-	if self.stepper < 12 then
+	if self.stepper < 15 then
 		return
 	else
 		self.stepper = random() 

@@ -46,7 +46,6 @@ minetest.register_node("mobs:spawner", {
 			end
 			local mobs = {
 				"mobs:rat",
-				"mobs:rat",
 				"mobs:npc",
 			}
 			local biome = minetest.get_biome_name(minetest.get_biome_data(pos).biome)
@@ -55,7 +54,7 @@ minetest.register_node("mobs:spawner", {
 			local protection = minetest.find_node_near(pos, 13,
 					{"protector:protect", "protector:protect2"}, true)
 			if not protection and (biome == "underground" or night) and
-						minetest.get_node_light(pos) < 7 then
+						minetest.get_node_light(pos) < 9 then
 				local mobs_to_insert = {
 					"mobs:dungeon_master",
 					"mobs:oerkki",
@@ -83,17 +82,18 @@ minetest.register_node("mobs:spawner", {
 				z = pos.z,
 			}
 			local p1 = {
-				x = spawn_pos.x + floor(colbox[1]),
-				y = spawn_pos.y + floor(colbox[2]),
-				z = spawn_pos.z + floor(colbox[3]),
+				x = spawn_pos.x + colbox[1],
+				y = spawn_pos.y + colbox[2],
+				z = spawn_pos.z + colbox[3],
 			}
 			local p2 = {
-				x = spawn_pos.x + ceil(colbox[4]),
-				y = spawn_pos.y + ceil(colbox[5]),
-				z = spawn_pos.z + ceil(colbox[6]),
+				x = spawn_pos.x + colbox[4],
+				y = spawn_pos.y + colbox[5],
+				z = spawn_pos.z + colbox[6],
 			}
+			local d = vector.distance(p1, p2) * 3.14
 			local _, s = minetest.find_nodes_in_area(p1, p2, "air", true)
-			if s["air"] < 9 then
+			if s["air"] < d then
 				return minetest.set_node(pos, {name = "air"})
 			end
 			minetest.add_entity(spawn_pos, mob)
