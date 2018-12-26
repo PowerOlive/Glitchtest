@@ -2,18 +2,8 @@
 
 fire = {}
 
--- 'Enable fire' setting
-
-local fire_enabled = minetest.settings:get_bool("enable_fire")
-if fire_enabled == nil then
-	-- enable_fire setting not specified, check for disable_fire
-	local fire_disabled = minetest.settings:get_bool("disable_fire")
-	if fire_disabled == nil then
-		-- Neither setting specified, check whether singleplayer
-		fire_enabled = minetest.is_singleplayer()
-	else
-		fire_enabled = not fire_disabled
-	end
+local fire_enabled = function(pos)
+	return not minetest.is_protected(pos, "")
 end
 
 --
@@ -62,7 +52,7 @@ minetest.register_node("fire:basic_flame", {
 
 	on_timer = function(pos)
 		local f = minetest.find_node_near(pos, 1, {"group:flammable"})
-		if not fire_enabled or not f then
+		if not fire_enabled(pos) or not f then
 			minetest.remove_node(pos)
 			return
 		end
@@ -71,11 +61,7 @@ minetest.register_node("fire:basic_flame", {
 	end,
 
 	on_construct = function(pos)
-		if not fire_enabled then
-			minetest.remove_node(pos)
-		else
-			minetest.get_node_timer(pos):start(math.random(30, 60))
-		end
+		minetest.get_node_timer(pos):start(math.random(30, 60))
 	end,
 
 	on_flood = flood_flame,
@@ -309,47 +295,43 @@ end
 -- ABMs
 --
 
-if fire_enabled then
+-- Ignite neighboring nodes, add basic flames
 
-	-- Ignite neighboring nodes, add basic flames
+minetest.register_abm({
+	label = "Ignite flame",
+	nodenames = {"group:flammable"},
+	neighbors = {"group:igniter"},
+	interval = 7,
+	chance = 12,
+	catch_up = false,
+	action = function(pos, node, active_object_count, active_object_count_wider)
+		local p = minetest.find_node_near(pos, 1, {"air"})
+		if p then
+			minetest.set_node(p, {name = "fire:basic_flame"})
+		end
+	end,
+})
 
-	minetest.register_abm({
-		label = "Ignite flame",
-		nodenames = {"group:flammable"},
-		neighbors = {"group:igniter"},
-		interval = 7,
-		chance = 12,
-		catch_up = false,
-		action = function(pos, node, active_object_count, active_object_count_wider)
-			local p = minetest.find_node_near(pos, 1, {"air"})
-			if p then
-				minetest.set_node(p, {name = "fire:basic_flame"})
+-- Remove flammable nodes around basic flame
+
+minetest.register_abm({
+	label = "Remove flammable nodes",
+	nodenames = {"fire:basic_flame"},
+	neighbors = "group:flammable",
+	interval = 5,
+	chance = 18,
+	catch_up = false,
+	action = function(pos, node, active_object_count, active_object_count_wider)
+		local p = minetest.find_node_near(pos, 1, {"group:flammable"})
+		if p then
+			local flammable_node = minetest.get_node(p)
+			local def = minetest.registered_nodes[flammable_node.name]
+			if def.on_burn then
+				def.on_burn(p)
+			else
+				minetest.remove_node(p)
+				minetest.check_for_falling(p)
 			end
-		end,
-	})
-
-	-- Remove flammable nodes around basic flame
-
-	minetest.register_abm({
-		label = "Remove flammable nodes",
-		nodenames = {"fire:basic_flame"},
-		neighbors = "group:flammable",
-		interval = 5,
-		chance = 18,
-		catch_up = false,
-		action = function(pos, node, active_object_count, active_object_count_wider)
-			local p = minetest.find_node_near(pos, 1, {"group:flammable"})
-			if p then
-				local flammable_node = minetest.get_node(p)
-				local def = minetest.registered_nodes[flammable_node.name]
-				if def.on_burn then
-					def.on_burn(p)
-				else
-					minetest.remove_node(p)
-					minetest.check_for_falling(p)
-				end
-			end
-		end,
-	})
-
-end
+		end
+	end,
+})
