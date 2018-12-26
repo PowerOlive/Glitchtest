@@ -19,10 +19,6 @@ minetest.register_node("mobs:spawner", {
 	wield_image = "air.png",
 	on_blast = function()
 	end,
-	--[[
-	on_destruct = function(pos)
-	end,
-	--]]
 	on_timer = function(pos, elapsed)
 		if elapsed > 48 then
 			local immediate_surrounding = minetest.get_objects_inside_radius(pos, 3.12)
@@ -46,9 +42,23 @@ minetest.register_node("mobs:spawner", {
 					return minetest.set_node(pos, {name = "air"})
 				end
 			end
+			local p1 = {
+				x = pos.x - 1,
+				y = pos.y - 1,
+				z = pos.z - 1,
+			}
+			local p2 = {
+				x = pos.x + 1,
+				y = pos.y + 1,
+				z = pos.z + 1,
+			}
+			local _, s = minetest.find_nodes_in_area(p1, p2, "air", true)
+			if s["air"] < 12 then
+				return minetest.set_node(pos, {name = "air"})
+			end
 			local mob_pos = pos
 			if minetest.registered_nodes[minetest.get_node_or_nil(pos).name].walkable then
-				mob_pos.y = mob_pos.y + 1
+				mob_pos.y = mob_pos.y + 1.67
 			end
 			local mobs = {
 				"mobs:rat",
@@ -80,6 +90,18 @@ minetest.register_node("mobs:spawner", {
 				end
 			end
 			local mob = mobs[math.random(#mobs)]
+			local hh = minetest.registered_entities[mob].collisionbox
+			local h = math.max(0, math.ceil(hh[5] - hh[2]) - 1)
+			for i = 0, h do
+				local n = minetest.get_node_or_nil{
+					x = mob_pos.x,
+					y = mob_pos.y + i,
+					z = mob_pos.z,
+				}
+				if n and minetest.registered_nodes[n.name].walkable then
+					return minetest.set_node(pos, {name = "air"})
+				end
+			end
 			minetest.add_entity(mob_pos, mob)
 			return minetest.set_node(pos, {name = "air"})
 		else

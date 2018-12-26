@@ -249,7 +249,7 @@ mobs:register_mob("mobs:npc", {
 	hp_min = 20,
 	hp_max = 20,
 	armor = 100,
-	collisionbox = {-0.25, 0.0, -0.25, 0.25, 1.65 , 0.25},
+	collisionbox = {-0.35, 0.0, -0.35, 0.35, 1.75 , 0.35},
 	visual = "mesh",
 	mesh = "character.b3d",
 	drawtype = "front",
