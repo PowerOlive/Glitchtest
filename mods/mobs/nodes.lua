@@ -77,25 +77,25 @@ minetest.register_node("mobs:spawner", {
 			end
 			local mob = mobs[random(#mobs)]
 			local colbox = minetest.registered_entities[mob].collisionbox
-			local p1 = {
-				x = pos.x + floor(colbox[1]),
-				y = pos.y + floor(colbox[2]),
-				z = pos.z + floor(colbox[3]),
-			}
-			local p2 = {
-				x = pos.x + ceil(colbox[4]),
-				y = pos.y + ceil(colbox[5]),
-				z = pos.z + ceil(colbox[6]),
-			}
-			local _, s = minetest.find_nodes_in_area(p1, p2, "air", true)
-			if s["air"] < 12 then
-				return minetest.set_node(pos, {name = "air"})
-			end
 			local spawn_pos = {
 				x = pos.x,
 				y = pos.y + 1.6,
 				z = pos.z,
 			}
+			local p1 = {
+				x = spawn_pos.x + floor(colbox[1]),
+				y = spawn_pos.y + floor(colbox[2]),
+				z = spawn_pos.z + floor(colbox[3]),
+			}
+			local p2 = {
+				x = spawn_pos.x + ceil(colbox[4]),
+				y = spawn_pos.y + ceil(colbox[5]),
+				z = spawn_pos.z + ceil(colbox[6]),
+			}
+			local _, s = minetest.find_nodes_in_area(p1, p2, "air", true)
+			if s["air"] < 9 then
+				return minetest.set_node(pos, {name = "air"})
+			end
 			minetest.add_entity(spawn_pos, mob)
 			return minetest.set_node(pos, {name = "air"})
 		else
