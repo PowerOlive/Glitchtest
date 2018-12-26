@@ -87,14 +87,33 @@ local pg_fs = function(pg_st)
 end
 
 npc_drops = {
-	"default:pick_steel", "default:sword_steel", "default:coral_skeleton",
-	"default:shovel_steel", "farming:bread", "fireflies:bug_net",
-	"default:gravel", "craftguide:book", "default:book",
-	"mobs:shears", "default:axe_steel", "default:mese_crystal_fragment",
-	"default:papyrus", "default:blueberries", "default:cactus",
-	"default:dry_shrub", "default:fern_3", "default:blueberry_bush_sapling",
-	"default:coral_green", "dye:red", "wool:white",
-	"wool:red", "wool:green", "default:bronze_ingot",
+	{name = "default:pick_steel", chance = 0.9},
+	{name = "default:sword_steel", chance = 0.9},
+	{name = "default:axe_steel", chance = 0.9},
+	{name = "default:shovel_steel", chance = 0.9},
+	{name = "fireflies:bug_net", chance = 0.7},
+	{name = "mobs:shears", chance = 0.5},
+
+	{name = "default:coral_skeleton", chance = 0.8, count = {1, 3}},
+	{name = "farming:bread", chance = 0.8, count = {1, 5}},
+	{name = "default:gravel", chance = 0.8},
+	{name = "default:dirt", chance = 0.67, count = {33, 66}},
+	{name = "default:dirt", chance = 0.67, count = {99, 99}},
+	{name = "craftguide:book", chance = 0.8},
+	{name = "default:book", chance = 0.8},
+	{name = "default:mese_crystal_fragment", chance = 0.8},
+	{name = "default:papyrus", chance = 0.8},
+	{name = "default:blueberries", chance = 0.8},
+	{name = "default:cactus", chance = 0.8},
+	{name = "default:dry_shrub", chance = 0.8},
+	{name = "default:fern_3", chance = 0.8},
+	{name = "default:blueberry_bush_sapling", chance = 0.8},
+	{name = "default:coral_green", chance = 0.8},
+	{name = "dye:red", chance = 0.8},
+	{name = "wool:white", chance = 0.8},
+	{name = "wool:red", chance = 0.8},
+	{name = "wool:green", chance = 0.8},
+	{name = "default:bronze_ingot", chance = 0.8},
 }
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
@@ -313,14 +332,18 @@ mobs:register_mob("mobs:npc", {
 				"dresser:skin_" .. dresser.skins[random(#dresser.skins)][1],
 
 			}
-			for i = random(1, 2), #npc_drops, 2 do
-				table.insert(ls, npc_drops[i] ..
-					" " .. random(1, random(9, 36)))
+			for i = random(1, 3), #npc_drops, random(1, 2) do
+				if npc_drops[i].chance > random() then
+					local c = npc_drops[i].count or {1, 1}
+					table.insert(ls,
+							npc_drops[i].name .. " " ..
+							random(c[1], c[2]))
+				end
 			end
 			local d_loot = dungeon_loot.registered_loot
-			local c = d_loot.count or {1, 2}
 			for i = random(1, 3), #d_loot, random(1, 2) do
 				if d_loot[i].chance > random() then
+					local c = d_loot[i].count or {1, 1}
 					table.insert(ls,
 							d_loot[i].name .. " " ..
 							random(c[1], c[2]))
