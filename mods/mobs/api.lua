@@ -2940,7 +2940,11 @@ local mob_step = function(self, dtime)
 			t = t + 1
 		end
 		if t >= 6 then
-			return self.object:remove()
+			if self.owner then
+				return
+			else
+				return self.object:remove()
+			end
 		end
 	end
 	if minetest.find_node_near(pos, 8, "mobs:spawner") then

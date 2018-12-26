@@ -21,18 +21,15 @@ minetest.register_node("mobs:spawner", {
 	end,
 	--[[
 	on_destruct = function(pos)
-		print(dump(minetest.get_node_timer(pos)))
 	end,
 	--]]
 	on_timer = function(pos, elapsed)
 		if elapsed > 48 then
-			local immediate_surrounding = minetest.get_objects_inside_radius(pos, 1.12)
+			local immediate_surrounding = minetest.get_objects_inside_radius(pos, 3.12)
 			if #immediate_surrounding > 0 then
-				--print("Clear!")
 				return minetest.set_node(pos, {name = "air"})
 			end
 			local surrounding = minetest.get_objects_inside_radius(pos, 16)
-			--print("There's " .. #surrounding .. "!")
 			if #surrounding > 6 then
 				local h = 0
 				for i = 1, #surrounding do
@@ -43,12 +40,9 @@ minetest.register_node("mobs:spawner", {
 					end
 					if s:is_player() then
 						h = h + 2
-						--print("Player!")
 					end
 				end
-				--print(h .. "!")
 				if h > 3 then
-					--print("Clear!")
 					return minetest.set_node(pos, {name = "air"})
 				end
 			end
@@ -87,10 +81,8 @@ minetest.register_node("mobs:spawner", {
 			end
 			local mob = mobs[math.random(#mobs)]
 			minetest.add_entity(mob_pos, mob)
-			--print("Go " .. mob .. "!")
 			return minetest.set_node(pos, {name = "air"})
 		else
-			--print("Go " .. math.floor(elapsed))
 			minetest.get_node_timer(pos):set(elapsed + 1, elapsed)
 		end
 	end,
@@ -121,7 +113,6 @@ minetest.register_abm({
 				end
 			end
 			if ttl > 4 then
-				--print("Clear " .. i .. " " .. s .. "!")
 				minetest.set_node(pos, {name = "air"})
 			end
 		end
