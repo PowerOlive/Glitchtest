@@ -1,7 +1,9 @@
 -- mobs/nodes.lua is part of Glitchtest
 -- Copyright 2018 James Stevenson
 -- GNU GPL 3
-
+local random = math.random
+local floor = math.floor
+local ceil = math.ceil
 minetest.register_node("mobs:spawner", {
 	description = "I spawn things!",
 	drawtype = "airlike",
@@ -20,7 +22,7 @@ minetest.register_node("mobs:spawner", {
 	on_blast = function()
 	end,
 	on_timer = function(pos, elapsed)
-		if elapsed > 48 then
+		if elapsed >= 30 then
 			local immediate_surrounding = minetest.get_objects_inside_radius(pos, 3.12)
 			if #immediate_surrounding > 0 then
 				return minetest.set_node(pos, {name = "air"})
@@ -42,24 +44,6 @@ minetest.register_node("mobs:spawner", {
 					return minetest.set_node(pos, {name = "air"})
 				end
 			end
-			local p1 = {
-				x = pos.x - 1,
-				y = pos.y - 1,
-				z = pos.z - 1,
-			}
-			local p2 = {
-				x = pos.x + 1,
-				y = pos.y + 1,
-				z = pos.z + 1,
-			}
-			local _, s = minetest.find_nodes_in_area(p1, p2, "air", true)
-			if s["air"] < 9 then
-				return minetest.set_node(pos, {name = "air"})
-			end
-			local mob_pos = pos
-			if minetest.registered_nodes[minetest.get_node_or_nil(pos).name].walkable then
-				mob_pos.y = mob_pos.y + 1.67
-			end
 			local mobs = {
 				"mobs:rat",
 				"mobs:npc",
@@ -67,13 +51,13 @@ minetest.register_node("mobs:spawner", {
 			local biome = minetest.get_biome_name(minetest.get_biome_data(pos).biome)
 			local tod = (minetest.get_timeofday() or 0) * 24000
 			local night = tod > 19000 or tod < 06000
-			local protection = minetest.find_node_near(mob_pos, 13,
+			local protection = minetest.find_node_near(pos, 13,
 					{"protector:protect", "protector:protect2"}, true)
 			if not protection and (biome == "underground" or night) then
 				local mobs_to_insert = {
 					"mobs:dungeon_master",
 					"mobs:oerkki",
-					"mobs:zombie" .. math.random(4),
+					"mobs:zombie" .. random(4),
 				}
 				for i = 1, #mobs_to_insert do
 					mobs[#mobs + 1] = mobs_to_insert[i]
@@ -89,20 +73,28 @@ minetest.register_node("mobs:spawner", {
 					mobs[#mobs + 1] = mobs_to_insert[i]
 				end
 			end
-			local mob = mobs[math.random(#mobs)]
-			local hh = minetest.registered_entities[mob].collisionbox
-			local h = math.max(0, math.ceil(hh[5] - hh[2]) - 1)
-			for i = 0, h do
-				local n = minetest.get_node_or_nil{
-					x = mob_pos.x,
-					y = mob_pos.y + i,
-					z = mob_pos.z,
-				}
-				if n and minetest.registered_nodes[n.name].walkable then
-					return minetest.set_node(pos, {name = "air"})
-				end
+			local mob = mobs[random(#mobs)]
+			local colbox = minetest.registered_entities[mob].collisionbox
+			local p1 = {
+				x = pos.x + floor(colbox[1]),
+				y = pos.y + floor(colbox[2]),
+				z = pos.z + floor(colbox[3]),
+			}
+			local p2 = {
+				x = pos.x + ceil(colbox[4]),
+				y = pos.y + ceil(colbox[5]),
+				z = pos.z + ceil(colbox[6]),
+			}
+			local _, s = minetest.find_nodes_in_area(p1, p2, "air", true)
+			if s["air"] < 19 then
+				return minetest.set_node(pos, {name = "air"})
 			end
-			minetest.add_entity(mob_pos, mob)
+			local spawn_pos = {
+				x = pos.x,
+				y = pos.y + 1.6,
+				z = pos.z,
+			}
+			minetest.add_entity(spawn_pos, mob)
 			return minetest.set_node(pos, {name = "air"})
 		else
 			minetest.get_node_timer(pos):set(elapsed + 1, elapsed)
