@@ -1,7 +1,7 @@
 local path = minetest.get_modpath(minetest.get_current_modname())
 local stepper = 0
 minetest.register_globalstep(function(dtime)
-	if stepper < 15 then
+	if stepper < 10 then
 		stepper = stepper + dtime
 		return
 	else

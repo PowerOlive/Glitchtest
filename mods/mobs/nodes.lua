@@ -2,8 +2,6 @@
 -- Copyright 2018 James Stevenson
 -- GNU GPL 3
 local random = math.random
-local floor = math.floor
-local ceil = math.ceil
 minetest.register_node("mobs:spawner", {
 	description = "I spawn things!",
 	drawtype = "airlike",
@@ -22,12 +20,12 @@ minetest.register_node("mobs:spawner", {
 	on_blast = function()
 	end,
 	on_timer = function(pos, elapsed)
-		if elapsed >= 30 then
-			local immediate_surrounding = minetest.get_objects_inside_radius(pos, 3.12)
+		if elapsed >= 10 then
+			local immediate_surrounding = minetest.get_objects_inside_radius(pos, 2.67)
 			if #immediate_surrounding > 0 then
 				return minetest.set_node(pos, {name = "air"})
 			end
-			local surrounding = minetest.get_objects_inside_radius(pos, 32)
+			local surrounding = minetest.get_objects_inside_radius(pos, 24)
 			if #surrounding > 6 then
 				local h = 0
 				for i = 1, #surrounding do
@@ -40,7 +38,7 @@ minetest.register_node("mobs:spawner", {
 						h = h + 2
 					end
 				end
-				if h > 3 then
+				if h > 10 then
 					return minetest.set_node(pos, {name = "air"})
 				end
 			end
@@ -91,7 +89,7 @@ minetest.register_node("mobs:spawner", {
 				y = spawn_pos.y + colbox[5],
 				z = spawn_pos.z + colbox[6],
 			}
-			local d = vector.distance(p1, p2) * 3.14
+			local d = vector.distance(p1, p2)
 			local r, s = minetest.find_nodes_in_area(p1, p2, "air", true)
 			if s["air"] < d then
 				return minetest.set_node(pos, {name = "air"})
@@ -115,9 +113,11 @@ minetest.register_abm({
 		local i = active_object_count
 		local s = active_object_count_wider
 		local t = minetest.get_node_timer(pos)
-		if not t or not t:is_started() or
-				s > 2 or i > 1 then
-			local things = minetest.get_objects_inside_radius(pos, 16)
+		if not t or not t:is_started() then
+			return minetest.set_node(pos, {name = "air"})
+		end
+		if s > 9 or i > 3 then
+			local things = minetest.get_objects_inside_radius(pos, 24)
 			local ttl = 0
 			for k, v in pairs(things) do
 				local h = v:get_luaentity()
@@ -129,7 +129,7 @@ minetest.register_abm({
 					ttl = ttl + 2
 				end
 			end
-			if ttl > 4 then
+			if ttl > 12 then
 				minetest.set_node(pos, {name = "air"})
 			end
 		end

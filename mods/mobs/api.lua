@@ -2928,13 +2928,13 @@ local mob_step = function(self, dtime)
 	runaway_from(self)
 	local stepper = self.stepper or random()
 	self.stepper = stepper + dtime
-	if self.stepper < 15 then
+	if self.stepper < 10 then
 		return
 	else
 		self.stepper = random() 
 	end
 	local t = 0
-	for k, v in pairs(minetest.get_objects_inside_radius(pos, 16)) do
+	for k, v in pairs(minetest.get_objects_inside_radius(pos, 24)) do
 		local s = v:get_luaentity()
 		if s and s.health then
 			t = t + 1
