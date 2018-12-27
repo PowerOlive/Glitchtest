@@ -263,8 +263,8 @@ terminal.display = function(source, user, pos, input)
 		default.gui_bg_img ..
 		"box[-.1,-.0;8.78,5.1;gray]" ..
 		fs_command ..
-		fs_output ..
 		"field[0.18,5.6;8,1;input;;]" ..
+		fs_output ..
 		"button[7.78,5.3;1.15,1;ok;OK]" ..
 		"field_close_on_enter[input;false]" ..
 	""
