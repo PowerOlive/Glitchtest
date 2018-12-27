@@ -4,6 +4,7 @@ Recommended setting in minetest.conf (requires 0.4.14 or newer) :
 ]]
 
 local plate = {}
+local message = jas0.message
 screwdriver = screwdriver or {}
 
 local function door_toggle(pos_actuator, pos_door, player)
@@ -36,7 +37,6 @@ local function door_toggle(pos_actuator, pos_door, player)
 		if f then
 			for i = 2, #f do
 				local word = f[i]
-				-- TODO check against terminal.commands[f]
 				if word == "warp" then
 					local warp = beds.beds[player:get_player_name()]
 					if warp then
@@ -55,7 +55,24 @@ local function door_toggle(pos_actuator, pos_door, player)
 						end
 					end
 				elseif word == "boom" then
-					tnt.boom(player:get_pos())
+					return tnt.boom(player:get_pos())
+				elseif word == "say" then
+					local meta = minetest.get_meta(pos_door)
+					local t = meta:get_int("delay")
+					if t == 0 then
+						local n = player:get_player_name()
+						local m = ""
+						for i = 4, #f do
+							if f[i] == "$name" then
+								f[i] = n
+							end
+							m = m .. f[i] .. " "
+						end
+						meta:set_int("delay", 20)
+						return message(n, m)
+					else
+						meta:set_int("delay", t - 1)
+					end
 				end
 			end
 		end
