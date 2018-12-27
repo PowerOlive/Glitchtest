@@ -2,10 +2,41 @@
 Recommended setting in minetest.conf (requires 0.4.14 or newer) :
 	nodetimer_interval = 0.1
 ]]
-
+mechanisms = {}
+screwdriver = screwdriver or {}
 local plate = {}
 local message = jas0.message
-screwdriver = screwdriver or {}
+
+mechanisms.warp = function(player, send)
+	if not send then
+		return
+	end
+	local warp = beds.beds[player:get_player_name()]
+	if warp then
+		warp = warp[send]
+	end
+	if warp then
+		player:set_pos(warp)
+	else
+		for p, w in pairs(beds.beds_public) do
+			for n, pos in pairs(w) do
+				if n == send then
+					player:set_pos(warp)
+					return
+				end
+			end
+		end
+	end
+end
+warp = mechanisms.warp
+
+mechanisms.boom = function(player)
+	local d = {
+		radius = 1.5,
+	}
+	return tnt.boom(player:get_pos(), d)
+end
+boom = mechanisms.boom
 
 local function door_toggle(pos_actuator, pos_door, player)
 	local rating = minetest.get_item_group(minetest.get_node_or_nil(pos_door).name)
@@ -37,41 +68,49 @@ local function door_toggle(pos_actuator, pos_door, player)
 		if f then
 			for i = 2, #f do
 				local word = f[i]
-				if word == "warp" then
-					local warp = beds.beds[player:get_player_name()]
-					if warp then
-						warp = warp[f[i + 1]]
-					end
-					if warp then
-						player:set_pos(warp)
-					else
-						for p, w in pairs(beds.beds_public) do
-							for n, pos in pairs(w) do
-								if n == f[i + 1] then
-									player:set_pos(pos)
-									return
-								end
-							end
-						end
-					end
-				elseif word == "boom" then
-					return tnt.boom(player:get_pos())
-				elseif word == "say" then
-					local meta = minetest.get_meta(pos_door)
-					local t = meta:get_int("delay")
-					if t == 0 then
+				if word == "warp" and
+						i == 3 then
+					return warp(player, f[i + 1])
+				elseif word == "boom" and
+						i == 3 then
+					return boom(player)
+				elseif word == "say" and
+						i == 3 then
+					local t = minetest.get_node_timer(pos_door)
+					if not t:is_started() then
+						t:start(2)
 						local n = player:get_player_name()
+						minetest.sound_play("walkie_blip", {
+							to_player = n,
+						})
 						local m = ""
+						local fz, id
 						for i = 4, #f do
-							if f[i] == "$name" then
+							-- TODO Extract extra string chars and return.
+							if f[i] == "$name" or
+									f[i]:match("$name") then
 								f[i] = n
+							elseif f[i] == ";" or
+									f[i]:match(";") then
+								fz = f[i + 1]
+								id = i
+								break
 							end
 							m = m .. f[i] .. " "
 						end
-						meta:set_int("delay", 20)
+						if fz then
+							message(n, m)
+							fz = mechanisms[fz]
+							if fz then
+								if f[id + 1] == "warp" then
+									fz(player, f[id + 2])
+								else
+									fz(player)
+								end
+							end
+							return
+						end
 						return message(n, m)
-					else
-						meta:set_int("delay", t - 1)
 					end
 				end
 			end
