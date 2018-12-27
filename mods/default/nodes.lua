@@ -1269,6 +1269,21 @@ minetest.register_node("default:mese", {
 	light_source = 3,
 })
 
+minetest.register_node("default:mese_", {
+	description = "Mese (You hacker you!)",
+	tiles = {"default_mese_block.png"},
+	paramtype = "light",
+	groups = {cracky = 1, level = 2, trade_value = 20},
+	sounds = default.node_sound_stone_defaults(),
+	light_source = default.LIGHT_MAX,
+	drop = "default:mese",
+	on_timer = function(pos, elapsed)
+		local h = minetest.find_node_near(pos, 1, "walkie:intercomm")
+		if not h then
+			minetest.swap_node(pos, {name = "default:mese"})
+		end
+	end,
+})
 
 minetest.register_node("default:stone_with_gold", {
 	description = "Gold Ore",

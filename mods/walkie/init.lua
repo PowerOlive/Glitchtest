@@ -254,12 +254,34 @@ minetest.register_node("walkie:intercomm", {
 		place = {name = "walkie_blip", gain = 1.0},
 		place_failed = {name = "walkie_blip", gain = 1.0}
 	},
+	after_place_node = function(pos, placer, itemstack, pointed_thing)
+		if minetest.get_node(pointed_thing.under).name == "default:mese" then
+			minetest.swap_node(pointed_thing.under,
+					{name = "default:mese_"})
+		end
+		local m = minetest.get_meta(pos)
+		for k, v in pairs(minetest.deserialize(itemstack:get_meta():get"stuff")) do
+			m:set_string(k, v)
+		end
+	end,
+	after_dig_node = function(pos, oldnode, oldmetadata, digger)
+		local h = minetest.find_node_near(pos, 1, "default:mese_")
+		if h then
+			minetest.get_node_timer(h):start(0)
+		end
+	end,
 	on_rightclick = function(pos, node, clicker, itemstack, pointed_thing)
 		terminal.display("node", clicker, pos)
 	end,
 	_on_function = function(pos)
 		local args = minetest.deserialize(minetest.get_meta(pos):get_string("_on_function"))
 		return args
+	end,
+	preserve_metadata = function(pos, oldnode, oldmeta, drops)
+		local m = minetest.serialize(oldmeta)
+		drops[1]:get_meta():set_string("stuff", m)
+	end,
+	on_blast = function()
 	end,
 })
 
