@@ -84,11 +84,11 @@ local function paper_displayer(player)
 	end
 	player:hud_change(paper_display[name],
 			"text", text)
-	minetest.after(0.15, paper_displayer, player)
+	minetest.after(0.25, paper_displayer, player)
 end
 minetest.register_on_joinplayer(function(player)
 	if not player then
 		return
 	end
-	minetest.after(0.15, paper_displayer, player)
+	minetest.after(0.25, paper_displayer, player)
 end)
