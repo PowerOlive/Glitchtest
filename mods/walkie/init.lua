@@ -260,8 +260,11 @@ minetest.register_node("walkie:intercomm", {
 					{name = "default:mese_"})
 		end
 		local m = minetest.get_meta(pos)
-		for k, v in pairs(minetest.deserialize(itemstack:get_meta():get"stuff")) do
-			m:set_string(k, v)
+		local s = minetest.deserialize(itemstack:get_meta():get"stuff")
+		if s then
+			for k, v in pairs(s) do
+				m:set_string(k, v)
+			end
 		end
 	end,
 	after_dig_node = function(pos, oldnode, oldmetadata, digger)
