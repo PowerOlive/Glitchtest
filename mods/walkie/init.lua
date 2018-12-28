@@ -255,11 +255,13 @@ minetest.register_node("walkie:intercomm", {
 		place_failed = {name = "walkie_blip", gain = 1.0}
 	},
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
+		local m = minetest.get_meta(pos)
 		if minetest.get_node(pointed_thing.under).name == "default:mese" then
 			minetest.swap_node(pointed_thing.under,
 					{name = "default:mese_"})
+			m:set_int("protect", 0)
+			m:set_int("power", 1)
 		end
-		local m = minetest.get_meta(pos)
 		local s = minetest.deserialize(itemstack:get_meta():get"stuff")
 		if s then
 			for k, v in pairs(s) do

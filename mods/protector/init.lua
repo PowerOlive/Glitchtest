@@ -1,18 +1,107 @@
+-- Original protector mod was by Zeg9, if I'm not mistaken.
+-- Protector redo by TenPlus1
+-- This version copyright 2018 jas GNU GPL 3
+-- Part of `Glitchtest' game.
 
--- Load support for intllib.
-local MP = minetest.get_modpath(minetest.get_current_modname())
-local S = dofile(MP .. "/intllib.lua")
+local S = dofile(minetest.get_modpath(minetest.get_current_modname()) ..
+		"/intllib.lua")
 local F = minetest.formspec_escape
-
-
+local Store = minetest.get_mod_storage()
+local AStore = AreaStore()
+local protector_radius = tonumber(minetest.settings:get("protector_radius")) or 9
 protector = {}
-protector.mod = "redo"
-protector.modpath = MP
+local areas = {}
+local idgg = 1
+local area_idds = {[1] = ""}
+local idg = function(r)
+	for i = 1, #area_idds + 1 do
+		if r then
+			area_idds[r] = nil
+			return
+		end
+		if area_idds[i] then
+		else	
+			area_idds[i] = ""
+			idgg = i
+			return idgg
+		end
+	end
+end
+protector.access = function(point, pos, name, action, radius)
+	if point == "mod" then
+		if action == "dump" then
+			if name then
+				return AStore:get_areas_for_pos(pos, true, true), areas[name]
+			else
+				return AStore:get_areas_for_pos(pos, true, true), areas
+			end
+		end
+		local a = Store:get"areas"
+		if a then
+			a = minetest.deserialize(a)
+		end
+		if a then
+			areas = a
+			for n, v in pairs(a) do
+				for i, d in pairs(v) do
+					AStore:insert_area(d.min, d.max, n, i)
+				end
+			end
+		end
+	elseif point == "area" then
+		if pos then
+			if action == "add" and name then
+				local r = radius or protector_radius
+				local p1 = {
+					x = pos.x - r,
+					y = pos.y - r,
+					z = pos.z - r,
+				}
+				local p2 = {
+					x = pos.x + r,
+					y = pos.y + r,
+					z = pos.z + r,
+				}
+				if not areas[name] then
+					areas[name] = {}
+				end
+				AStore:insert_area(p1, p2, name, idgg)
+				areas[name][idgg] = {
+					min = p1,
+					max = p2,
+					src = pos,
+				}
+				Store:set_string("areas",
+						minetest.serialize(areas))
+				print("Added: " .. idgg)
+				idg()
+			elseif action == "remove" then
+				for aid, v in pairs(AStore:get_areas_for_pos(pos, true, true)) do
+					local n = v.data
+					if n and areas[n] then
+						if vector.equals(pos, areas[n][aid].src) then
+							local r = AStore:remove_area(aid)
+							if not r then
+								print("er")
+							else
+								areas[n][aid] = nil
+								idg(aid)
+								Store:set_string("areas",
+										minetest.serialize(areas))
+								print("Removed: " .. aid)
+								return
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+protector.access("mod")
 protector.intllib = S
-
 local protector_max_share_count = 12
 -- get minetest.conf settings
-local protector_radius = tonumber(minetest.settings:get("protector_radius")) or 5
 local protector_flip = minetest.settings:get_bool("protector_flip") or false
 local protector_hurt = tonumber(minetest.settings:get("protector_hurt")) or 0
 local protector_spawn = tonumber(minetest.settings:get("protector_spawn")
@@ -22,88 +111,64 @@ local protector_spawn = tonumber(minetest.settings:get("protector_spawn")
 local statspawn = minetest.string_to_pos(minetest.settings:get("static_spawnpoint"))
 		or {x = 0, y = 2, z = 0}
 
-
 -- return list of members as a table
 local get_member_list = function(meta)
-
 	return meta:get_string("members"):split(" ")
 end
 
-
 -- write member list table in protector meta as string
 local set_member_list = function(meta, list)
-
 	meta:set_string("members", table.concat(list, " "))
 end
 
-
--- check for owner name
 local is_owner = function(meta, name)
-
 	return name == meta:get_string("owner")
 end
 
-
 -- check for member name
 local is_member = function (meta, name)
-
 	for _, n in pairs(get_member_list(meta)) do
-
 		if n == name then
 			return true
 		end
 	end
-
 	return false
 end
 
-
 -- add player name to table as member
 local add_member = function(meta, name)
-
 	-- Constant (20) defined by player.h
 	if name:len() > 25 then
 		return
 	end
-
 	-- does name already exist?
 	if is_owner(meta, name)
 	or is_member(meta, name) then
 		return
 	end
-
 	local list = get_member_list(meta)
-
 	if #list >= protector_max_share_count then
 		return
 	end
-
 	table.insert(list, name)
-
 	set_member_list(meta, list)
 end
 
-
 -- remove player name from table
 local del_member = function(meta, name)
-
 	local list = get_member_list(meta)
-
 	for i, n in pairs(list) do
-
 		if n == name then
 			table.remove(list, i)
 			break
 		end
 	end
-
 	set_member_list(meta, list)
 end
 
 
 -- protector interface
 local protector_formspec = function(meta)
-
 	local formspec = "size[8,7]"
 		.. default.gui_bg
 		.. default.gui_bg_img
@@ -113,66 +178,49 @@ local protector_formspec = function(meta)
 		.. "label[0,2;" .. F(S("Members:")) .. "]"
 		.. "button_exit[2.5,6.2;3,0.5;close_me;" .. F(S("Close")) .. "]"
 		.. "field_close_on_enter[protector_add_member;false]"
-
 	local members = get_member_list(meta)
 	local npp = protector_max_share_count -- max users added to protector list
 	local i = 0
-
 	for n = 1, #members do
-
 		if i < npp then
-
 			-- show username
 			formspec = formspec .. "button[" .. (i % 4 * 2)
 			.. "," .. math.floor(i / 4 + 3)
 			.. ";1.5,.5;protector_member;" .. F(members[n]) .. "]"
-
 			-- username remove button
 			.. "button[" .. (i % 4 * 2 + 1.25) .. ","
 			.. math.floor(i / 4 + 3)
 			.. ";.75,.5;protector_del_member_" .. F(members[n]) .. ";X]"
 		end
-
 		i = i + 1
 	end
-
 	if i < npp then
-
 		-- user name entry field
 		formspec = formspec .. "field[" .. (i % 4 * 2 + 1 / 3) .. ","
 		.. (math.floor(i / 4 + 3) + 1 / 3)
 		.. ";1.433,.5;protector_add_member;;]"
-
 		-- username add button
 		.."button[" .. (i % 4 * 2 + 1.25) .. ","
 		.. math.floor(i / 4 + 3) .. ";.75,.5;protector_submit;+]"
-
 	end
-
 	return formspec
 end
 
-
 -- check if pos is inside a protected spawn area
 local inside_spawn = function(pos, radius)
-
 	if protector_spawn <= 0 then
 		return false
 	end
-
 	if pos.x < statspawn.x + radius
 	and pos.x > statspawn.x - radius
 	and pos.y < statspawn.y + radius
 	and pos.y > statspawn.y - radius
 	and pos.z < statspawn.z + radius
 	and pos.z > statspawn.z - radius then
-
 		return true
 	end
-
 	return false
 end
-
 
 -- Infolevel:
 -- 0 for no info
@@ -181,7 +229,6 @@ end
 -- 3 for checking protector overlaps
 
 protector.can_dig = function(r, pos, digger, onlyowner, infolevel)
-
 	if not digger or not pos then
 		return false
 	end
@@ -205,11 +252,28 @@ protector.can_dig = function(r, pos, digger, onlyowner, infolevel)
 		return false
 	end
 
-	-- find the protector nodes
-	local pos = minetest.find_nodes_in_area(
-		{x = pos.x - r, y = pos.y - r, z = pos.z - r},
-		{x = pos.x + r, y = pos.y + r, z = pos.z + r},
-		{"protector:protect", "protector:protect2"})
+	local p1 = {
+		x = pos.x - r,
+		y = pos.y - r,
+		z = pos.z - r,
+	}
+	local p2 = {
+		x = pos.x + r,
+		y = pos.y + r,
+		z = pos.z + r,
+	}
+	local as = AStore:get_areas_in_area(p1, p2, true, true, true)
+	for k, v in pairs(as) do
+		local d = v.data
+		if d and d ~= digger then
+			return false
+		else
+			print(true)
+			break
+		end
+	end
+	local pos = minetest.find_nodes_in_area(p1, p2,
+			{"protector:protect", "protector:protect2"})
 
 	local meta, owner, members
 
@@ -270,7 +334,6 @@ local old_is_protected = minetest.is_protected
 
 -- check for protected area, return true if protected and digger isn't on list
 function minetest.is_protected(pos, digger)
-
 	digger = digger or "" -- nil check
 
 	-- is area protected against digger?
@@ -313,10 +376,8 @@ function minetest.is_protected(pos, digger)
 				end
 			end
 		end
-
 		return true
 	end
-
 	-- otherwise can dig or place
 	return old_is_protected(pos, digger)
 end
@@ -358,8 +419,51 @@ end
 
 -- temporary pos store
 local player_pos = {}
+local after_place_node = function(pos, placer)
+	---[[
+	local meta = minetest.get_meta(pos)
+	meta:set_string("owner", placer:get_player_name() or "")
+	meta:set_string("infotext", "Protection owned by @1!",
+			meta:get_string("owner"))
+	meta:set_string("members", "")
+	--]]
+	protector.access("area", pos, placer:get_player_name(), "add")
+end
+local on_use = function(itemstack, user, pointed_thing)
+	if pointed_thing.type ~= "node" then
+		return
+	end
+	protector.can_dig(protector_radius,
+			pointed_thing.under, user:get_player_name(), false, 2)
+end
+local on_rightclick = function(pos, node, clicker, itemstack)
+	local meta = minetest.get_meta(pos)
+	local name = clicker:get_player_name()
+	if meta
+	and protector.can_dig(1, pos, name, true, 1) then
+		player_pos[name] = pos
+		minetest.show_formspec(name,
+				"protector:node", protector_formspec(meta))
+	end
+end
+local on_punch = function(pos, node, puncher)
+	if minetest.is_protected(pos, puncher:get_player_name()) then
+		return
+	end
+	minetest.add_entity(pos, "protector:display")
+end
+local can_dig = function(pos, player)
+	break
+	return player and protector.can_dig(1, pos, player:get_player_name(), true, 1)
+end
+local after_destruct = function(pos, oldnode)
+	local objects = minetest.get_objects_inside_radius(pos, 0.5)
+	for _, v in ipairs(objects) do
+		v:remove()
+	end
+	protector.access("area", pos, nil, "remove")
+end
 
--- protection node
 minetest.register_node("protector:protect", {
 	description = "Protection Block\n" ..
 			"Swing me to see if what's pointed is protected!",
@@ -374,83 +478,21 @@ minetest.register_node("protector:protect", {
 	is_ground_content = false,
 	paramtype = "light",
 	light_source = 4,
-
 	node_box = {
 		type = "fixed",
 		fixed = {
 			{-0.5 ,-0.5, -0.5, 0.5, 0.5, 0.5},
 		}
 	},
-
 	on_place = check_overlap,
-
-	after_place_node = function(pos, placer)
-
-		local meta = minetest.get_meta(pos)
-
-		meta:set_string("owner", placer:get_player_name() or "")
-		meta:set_string("infotext", "Protection owned by @1!", meta:get_string("owner"))
-		meta:set_string("members", "")
-	end,
-
-	on_use = function(itemstack, user, pointed_thing)
-
-		if pointed_thing.type ~= "node" then
-			return
-		end
-
-		protector.can_dig(protector_radius, pointed_thing.under, user:get_player_name(), false, 2)
-	end,
-
-	on_rightclick = function(pos, node, clicker, itemstack)
-
-		local meta = minetest.get_meta(pos)
-		local name = clicker:get_player_name()
-
-		if meta
-		and protector.can_dig(1, pos, name, true, 1) then
-
-			player_pos[name] = pos
-
-			minetest.show_formspec(name, "protector:node", protector_formspec(meta))
-		end
-	end,
-
-	on_punch = function(pos, node, puncher)
-
-		if minetest.is_protected(pos, puncher:get_player_name()) then
-			return
-		end
-
-		minetest.add_entity(pos, "protector:display")
-	end,
-
-	can_dig = function(pos, player)
-
-		return player and protector.can_dig(1, pos, player:get_player_name(), true, 1)
-	end,
-
+	after_place_node = after_place_node,
+	on_use = on_use,
+	on_rightclick = on_rightclick,
+	on_punch = on_punch,
+	can_dig = can_dig,
 	on_blast = function() end,
-
-	after_destruct = function(pos, oldnode)
-		local objects = minetest.get_objects_inside_radius(pos, 0.5)
-		for _, v in ipairs(objects) do
-			v:remove()
-		end
-	end,
+	after_destruct = after_destruct,
 })
-
-minetest.register_craft({
-	output = "protector:protect",
-	recipe = {
-		{"default:stone", "default:stone", "default:stone"},
-		{"default:stone", "default:mese_crystal", "default:stone"},
-		{"default:stone", "default:stone", "default:stone"},
-	}
-})
-
-
--- protection logo
 minetest.register_node("protector:protect2", {
 	description = "Protection Logo\n" ..
 			"Swing me to see if what's pointed is protected!",
@@ -473,66 +515,25 @@ minetest.register_node("protector:protect2", {
 		wall_side   = {-0.5, -0.5, -0.375, -0.4375, 0.5, 0.375},
 	},
 	selection_box = {type = "wallmounted"},
-
 	on_place = check_overlap,
-
-	after_place_node = function(pos, placer)
-
-		local meta = minetest.get_meta(pos)
-
-		meta:set_string("owner", placer:get_player_name() or "")
-		meta:set_string("infotext", S("Protection (owned by @1)", meta:get_string("owner")))
-		meta:set_string("members", "")
-	end,
-
-	on_use = function(itemstack, user, pointed_thing)
-
-		if pointed_thing.type ~= "node" then
-			return
-		end
-
-		protector.can_dig(protector_radius, pointed_thing.under, user:get_player_name(), false, 2)
-	end,
-
-	on_rightclick = function(pos, node, clicker, itemstack)
-
-		local meta = minetest.get_meta(pos)
-		local name = clicker:get_player_name()
-
-		if meta
-		and protector.can_dig(1, pos, name, true, 1) then
-
-			player_pos[name] = pos
-
-			minetest.show_formspec(name, "protector:node", protector_formspec(meta))
-		end
-	end,
-
-	on_punch = function(pos, node, puncher)
-
-		if minetest.is_protected(pos, puncher:get_player_name()) then
-			return
-		end
-
-		minetest.add_entity(pos, "protector:display")
-	end,
-
-	can_dig = function(pos, player)
-
-		return player and protector.can_dig(1, pos, player:get_player_name(), true, 1)
-	end,
-
+	after_place_node = after_place_node,
+	on_use = on_use,
+	on_rightclick = on_rightclick,
+	on_punch = on_punch,
+	can_dig = can_dig,
 	on_blast = function() end,
-
-	after_destruct = function(pos, oldnode)
-		local objects = minetest.get_objects_inside_radius(pos, 0.5)
-		for _, v in ipairs(objects) do
-			v:remove()
-		end
-	end,
+	after_destruct = after_destruct,
 })
 
--- recipes to switch between protectors
+minetest.register_craft({
+	output = "protector:protect",
+	recipe = {
+		{"default:stone", "default:stone", "default:stone"},
+		{"default:stone", "default:mese_crystal", "default:stone"},
+		{"default:stone", "default:stone", "default:stone"},
+	}
+})
+
 minetest.register_craft({
 	type = "shapeless",
 	output = "protector:protect",
@@ -548,7 +549,6 @@ minetest.register_craft({
 
 -- check formspec buttons or when name entered
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-
 	if formname ~= "protector:node" then
 		return
 	end
@@ -621,11 +621,8 @@ minetest.register_entity("protector:display", {
 	visual_size = {x = 1.0 / 1.5, y = 1.0 / 1.5},
 	textures = {"protector:display_node"},
 	timer = 0,
-
 	on_step = function(self, dtime)
-
 		self.timer = self.timer + dtime
-
 		-- remove after 5 seconds
 		if self.timer > 5 then
 			self.object:remove()

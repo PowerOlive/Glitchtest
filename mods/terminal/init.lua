@@ -218,6 +218,14 @@ terminal.display = function(source, user, pos, input)
 			end
 		end
 		feedback = "`home', `spawn_switch'"
+	elseif command == "protect" and
+			source == "node" then
+		local aa, aaa = protector.access("mod", pos, name, "dump")
+		print("------------\n")
+		print(dump(aa))
+		print("\n")
+		print(dump(aaa))
+		print("\n------------")
 	elseif command == "sign" then
 		command = "Signed:" 
 		local s = ""
