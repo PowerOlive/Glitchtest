@@ -20,7 +20,7 @@ mechanisms.warp = function(player, send)
 	else
 		for p, w in pairs(beds.beds_public) do
 			for n, pos in pairs(w) do
-				if n == send then
+				if n == send and warp then
 					player:set_pos(warp)
 					return
 				end
