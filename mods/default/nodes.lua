@@ -2752,7 +2752,6 @@ default.register_fence_rail("default:fence_rail_aspen_wood", {
 	groups = {choppy = 3, oddly_breakable_by_hand = 2, flammable = 2},
 	sounds = default.node_sound_wood_defaults()
 })
-minetest.register_alias("default:glass", "default:glass_white")
 for i = 1, #dye.dyes do
 	local c = dye.dyes[i][1]
 	if c == "dark_grey" then

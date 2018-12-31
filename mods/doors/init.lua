@@ -476,9 +476,9 @@ doors.register("door_glass", {
 		sound_open = "doors_glass_door_open",
 		sound_close = "doors_glass_door_close",
 		recipe = {
-			{"default:glass", "default:glass"},
-			{"default:glass", "default:glass"},
-			{"default:glass", "default:glass"},
+			{"default:glass_white", "default:glass_white"},
+			{"default:glass_white", "default:glass_white"},
+			{"default:glass_white", "default:glass_white"},
 		}
 })
 
