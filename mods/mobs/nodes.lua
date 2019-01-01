@@ -21,6 +21,17 @@ minetest.register_node("mobs:spawner", {
 	end,
 	on_timer = function(pos, elapsed)
 		if elapsed >= 10 then
+			local node = minetest.get_node_or_nil({
+				x = pos.x,
+				y = pos.y - 1,
+				z = pos.z
+			})
+			if node and node.name then
+				local node_below = minetest.registered_nodes[node.name]
+				if node_below and not node_below.walkable then
+					return minetest.set_node(pos, {name = "air"})
+				end
+			end
 			local immediate_surrounding = minetest.get_objects_inside_radius(pos, 2.67)
 			if #immediate_surrounding > 0 then
 				return minetest.set_node(pos, {name = "air"})
