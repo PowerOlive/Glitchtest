@@ -3,14 +3,21 @@ machines = {}
 local function get_sat_time(stack)
 	if stack then
 		stack = stack[1]
-		stack:set_count(stack:get_count() - 1)
+		local c = stack:get_count()
+		if c > 1 then
+			stack:set_count(stack:get_count() - 1)
+		else
+			stack = ""
+		end
+	else
+		stack = ""
 	end
 	return {
 		time = 11,
 		item = ItemStack("default:mossycobble"),
 	},
 	{
-		items = {stack or ""},
+		items = {stack},
 	}
 end
 local function get_soak_time()
@@ -88,7 +95,8 @@ local function allow_metadata_inventory_put(pos, listname, index, stack, player)
 	local inv = meta:get_inventory()
 	if listname == "fuel" then
 		--if minetest.get_craft_result({method="fuel", width=1, items={stack}}).time ~= 0 then
-		if stack:get_name() == "bucket:bucket_water" then
+		if stack:get_name() == "bucket:bucket_water" or
+				stack:get_name() == "bucket:bucket_empty" then
 			if inv:is_empty("src") then
 				meta:set_string("infotext", "Generator is empty")
 			end
@@ -278,7 +286,27 @@ local function furnace_node_timer(pos, elapsed)
 
 	return result
 end
-
+minetest.register_abm({
+	nodenames = {"machines:generator_mossycobble"},
+	neighbors = {"default:water_source"},
+	interval = 6.3,
+	chance = 1,
+	catch_up = false,
+	action = function(pos, node, active_object_count, active_object_count_wider)
+		local m = minetest.get_node_or_nil({
+			x = pos.x,
+			y = pos.y - 1,
+			z = pos.z
+		})
+		if m and m.name and m.name == "default:water_source" then
+			local inv = minetest.get_inventory({type = "node", pos = pos})
+			if inv and inv:get_stack("fuel", 1):get_name() == "bucket:bucket_empty" then
+				inv:remove_item("fuel", inv:get_stack("fuel", 1))
+				inv:add_item("fuel", ItemStack("bucket:bucket_water"))
+			end
+		end
+	end,
+})
 --
 -- Node definitions
 --
