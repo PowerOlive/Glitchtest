@@ -303,6 +303,10 @@ minetest.register_abm({
 			if inv and inv:get_stack("fuel", 1):get_name() == "bucket:bucket_empty" then
 				inv:remove_item("fuel", inv:get_stack("fuel", 1))
 				inv:add_item("fuel", ItemStack("bucket:bucket_water"))
+				local t = minetest.get_node_timer(pos)
+				if not t:is_started() then
+					t:start(1)
+				end
 			end
 		end
 	end,
