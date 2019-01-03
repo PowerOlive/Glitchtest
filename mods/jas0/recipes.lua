@@ -91,6 +91,14 @@ minetest.register_craft({
 })
 
 minetest.register_craft({
+	output = "default:bookshelf",
+	recipe = {
+		{"group:wood", "group:wood", "group:wood"},
+		{"group:book", "group:book", "group:book"},
+		{"group:wood", "group:wood", "group:wood"},
+	},
+})
+minetest.register_craft({
 	output = "craftguide:book",
 	type = "shapeless",
 	recipe = {
