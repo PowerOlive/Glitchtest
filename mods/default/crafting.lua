@@ -796,7 +796,7 @@ minetest.register_craft({
 
 minetest.register_craft({
 	type = "cooking",
-	output = "default:glass",
+	output = "default:glass_white",
 	recipe = "group:sand",
 })
 
