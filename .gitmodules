@@ -1,0 +1,9 @@
+[submodule "mods/subterrane"]
+	path = mods/subterrane
+	url = git://github.com/facedeer/subterrane.git
+[submodule "mods/caverealms"]
+	path = mods/caverealms
+	url = git://github.com/facedeer/minetest-caverealms.git
+[submodule "mods/mapgen_helper"]
+	path = mods/mapgen_helper
+	url = git://github.com/facedeer/mapgen_helper.git
