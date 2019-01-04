@@ -153,8 +153,11 @@ terminal.display = function(source, user, pos, input)
 				output = "list warps <public|private>"
 				feedback = "`public' or `private'"
 			elseif args[3] == "private" then
-				local beds = beds.beds[name]
-				for k, v in pairs(beds) do
+				local bedss = beds.beds[name]
+				if not bedss then
+					return
+				end
+				for k, v in pairs(bedss) do
 					output = output .. k .. ", "
 				end
 				output = output:sub(1, -3)
