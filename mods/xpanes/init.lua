@@ -185,8 +185,8 @@ for k, v in ipairs(dye.dyes) do
 			sounds = default.node_sound_glass_defaults(),
 			groups = {snappy = 2, cracky = 3, oddly_breakable_by_hand = 3},
 			recipe = {
-				{"default:glass", "default:glass", "default:glass"},
-				{"default:glass", "default:glass", "default:glass"}
+				{"default:glass_white", "default:glass_white", "default:glass_white"},
+				{"default:glass_white", "default:glass_white", "default:glass_white"}
 			}
 		})
 	else
@@ -204,8 +204,8 @@ for k, v in ipairs(dye.dyes) do
 			groups = {snappy = 2, cracky = 3, oddly_breakable_by_hand = 3},
 			recipe = {
 				{"dye:" .. v[1], "dye:" .. v[1], "dye:" .. v[1]},
-				{"default:glass", "default:glass", "default:glass"},
-				{"default:glass", "default:glass", "default:glass"}
+				{"default:glass_white", "default:glass_white", "default:glass_white"},
+				{"default:glass_white", "default:glass_white", "default:glass_white"}
 			}
 		})
 	end
