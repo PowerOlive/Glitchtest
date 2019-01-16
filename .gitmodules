@@ -1,3 +1,6 @@
 [submodule "mods/dfcaverns"]
 	path = mods/dfcaverns
 	url = git://github.com/facedeer/dfcaverns.git
+[submodule "mods/craftguide"]
+	path = mods/craftguide
+	url = git://github.com/minetest-mods/craftguide.git
