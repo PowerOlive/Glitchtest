@@ -2,6 +2,79 @@
 -- Copyright 2018 James Stevenson
 -- GNU GPL 3
 
+
+-- Books and paper and craftguidestuff
+minetest.clear_craft({
+	output = "craftguide:book",
+})
+
+minetest.clear_craft({
+	output = "craftguide:sign",
+})
+
+minetest.register_craft({
+	output = "craftguide:sign",
+	type = "shapeless",
+	recipe = {
+		"default:sign_wall",
+		"walkie:talkie",
+	},
+})
+
+minetest.register_craft({
+	output = "default:book",
+	type = "shapeless",
+	recipe = {"craftguide:book"},
+})
+
+minetest.register_craft({
+	output = "craftguide:book",
+	type = "shapeless",
+	recipe = {
+		"default:book",
+		"walkie:talkie",
+	},
+})
+
+minetest.register_craft({
+	output = "craftguide:book",
+	type = "shapeless",
+	recipe = {
+		"default:book_written",
+		"walkie:talkie",
+	},
+})
+
+minetest.register_craft({
+	output = "default:paper",
+	type = "shapeless",
+	recipe = {"default:book_written"},
+})
+
+minetest.register_craft({
+	output = "default:paper",
+	type = "shapeless",
+	recipe = {"default:book"},
+})
+
+minetest.register_craft({
+	output = "default:book",
+	type = "shapeless",
+	recipe = {
+		"dye:white",
+		"default:book_written",
+	},
+})
+
+minetest.register_craft({
+	output = "default:bookshelf",
+	recipe = {
+		{"group:wood", "group:wood", "group:wood"},
+		{"group:book", "group:book", "group:book"},
+		{"group:wood", "group:wood", "group:wood"},
+	},
+})
+
 minetest.register_craft({
 	output = "default:dirt_with_snow",
 	recipe = {
@@ -9,6 +82,7 @@ minetest.register_craft({
 		{"default:dirt"},
 	},
 })
+
 minetest.register_craft({
 	output = "default:dirt_with_snow",
 	recipe = {
@@ -24,6 +98,7 @@ minetest.register_craft({
 		{"default:dirt"},
 	},
 })
+
 minetest.register_craft({
 	output = "default:dirt_with_grass",
 	recipe = {
@@ -39,6 +114,7 @@ minetest.register_craft({
 		{"default:dirt"},
 	},
 })
+
 minetest.register_craft({
 	output = "default:dirt_with_dry_grass",
 	recipe = {
@@ -63,56 +139,6 @@ minetest.register_craft({
 	output = "mobs:leather 2",
 	type = "shapeless",
 	recipe = {"backpacks:backpack_leather"},
-})
-
-minetest.register_craft({
-	output = "default:paper",
-	type = "shapeless",
-	recipe = {"default:book_written"},
-})
-minetest.register_craft({
-	output = "default:paper",
-	type = "shapeless",
-	recipe = {"default:book"},
-})
-
-minetest.register_craft({
-	output = "default:book",
-	type = "shapeless",
-	recipe = {
-		"dye:white",
-		"default:book_written",
-	},
-})
-minetest.register_craft({
-	output = "default:book",
-	type = "shapeless",
-	recipe = {"craftguide:book"},
-})
-
-minetest.register_craft({
-	output = "default:bookshelf",
-	recipe = {
-		{"group:wood", "group:wood", "group:wood"},
-		{"group:book", "group:book", "group:book"},
-		{"group:wood", "group:wood", "group:wood"},
-	},
-})
-minetest.register_craft({
-	output = "craftguide:book",
-	type = "shapeless",
-	recipe = {
-		"default:book",
-		"walkie:talkie",
-	},
-})
-minetest.register_craft({
-	output = "craftguide:book",
-	type = "shapeless",
-	recipe = {
-		"default:book_written",
-		"walkie:talkie",
-	},
 })
 
 minetest.register_craft({
