@@ -24,7 +24,7 @@ minetest.register_node("mobs:spawner", {
 	on_blast = function()
 	end,
 	on_timer = function(pos, elapsed)
-		if elapsed >= 10 then
+		if elapsed >= 30 then
 			local node = minetest.get_node_or_nil({
 				x = pos.x,
 				y = pos.y - 1,
