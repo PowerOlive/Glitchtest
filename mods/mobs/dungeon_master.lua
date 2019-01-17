@@ -1,4 +1,9 @@
 local S = mobs.intllib
+local boom = function(pos, radius)
+	radius = radius or 2
+	tnt.boom(pos, {radius = radius,
+			damage_radius = radius,})
+end
 -- Dungeon Master by PilzAdam
 mobs:register_mob("mobs:dungeon_master", {
 	type = "monster",
@@ -25,13 +30,16 @@ mobs:register_mob("mobs:dungeon_master", {
 	},
 	makes_footstep_sound = true,
 	sounds = {
+		warcry = "mobs_dungeonmaster",
+		attack = "mobs_dungeonmaster",
+		die = "mobs_dungeonmaster",
 		random = "mobs_dungeonmaster",
 		shoot_attack = "mobs_fireball",
 	},
 	walk_velocity = 1,
 	--run_velocity = 1,
 	--jump = true,
-	--view_range = 15,
+	view_range = 7,
 	drops = {
 		{name = "default:mese_crystal", chance = 1, min = 1, max = 2},
 		{name = "default:diamond", chance = 2, min = 0, max = 1},
@@ -52,6 +60,9 @@ mobs:register_mob("mobs:dungeon_master", {
 		speed_normal = 15,
 		speed_run = 15,
 	},
+	on_die = function(self, pos)
+		boom(pos)
+	end,
 })
 
 mobs:register_egg("mobs:dungeon_master", S("Dungeon Master"), "fire_basic_flame.png", 1, true)
@@ -59,54 +70,23 @@ mobs:register_egg("mobs:dungeon_master", S("Dungeon Master"), "fire_basic_flame.
 -- fireball (weapon)
 mobs:register_arrow("mobs:fireball", {
 	visual = "sprite",
-	visual_size = {x = 1, y = 1},
+	visual_size = {x = 1.5, y = 1.5},
 	textures = {"mobs_fireball.png"},
 	collisionbox = {-0.1, -0.1, -0.1, 0.1, 0.1, 0.1},
-	velocity = 7,
-	--tail = 1,
-	--tail_texture = "mobs_fireball.png",
-	--tail_size = 10,
+	velocity = 9,
 	glow = 14,
 	expire = 0.1,
 	on_activate = function(self, staticdata, dtime_s)
 		-- make fireball indestructable
 		self.object:set_armor_groups({immortal = 1, fleshy = 100})
 	end,
-	-- if player has a good weapon with 7+ damage it can deflect fireball
-	on_punch = function(self, hitter, tflp, tool_capabilities, dir)
-		if hitter and hitter:is_player() and
-				tool_capabilities and dir then
-			local damage = tool_capabilities.damage_groups and
-					tool_capabilities.damage_groups.fleshy or 1
-			local tmp = tflp / (tool_capabilities.full_punch_interval or 1.4)
-			if damage > 6 and tmp < 4 then
-				self.object:set_velocity({
-					x = dir.x * self.velocity,
-					y = dir.y * self.velocity,
-					z = dir.z * self.velocity,
-				})
-			end
-		end
-	end,
-	-- direct hit, no fire... just plenty of pain
 	hit_player = function(self, player)
-		player:punch(self.object, 1.0, {
-			full_punch_interval = 1.0,
-			damage_groups = {fleshy = 8},
-		}, nil)
-		tnt.boom(self.object:get_pos(), {radius = 3})
+		boom(self.object:get_pos())
 	end,
-
 	hit_mob = function(self, player)
-		player:punch(self.object, 1.0, {
-			full_punch_interval = 1.0,
-			damage_groups = {fleshy = 8},
-		}, nil)
-		tnt.boom(self.object:get_pos(), {radius = 3})
+		boom(self.object:get_pos())
 	end,
-
-	-- node hit
 	hit_node = function(self, pos, node)
-		tnt.boom(self.object:get_pos(), {radius = 3})
+		boom(self.object:get_pos())
 	end
 })
