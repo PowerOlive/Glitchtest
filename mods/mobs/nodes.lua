@@ -107,7 +107,7 @@ minetest.register_abm({
 	chance = 1,
 	catch_up = false,
 	action = function(pos, node, active_object_count, active_object_count_wider)
-		print(active_object_count, active_object_count_wider)
+		--print(active_object_count, active_object_count_wider)
 		limiter(pos)
 	end,
 })
