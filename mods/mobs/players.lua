@@ -1,5 +1,17 @@
 local random = math.random
 
+mobs.check_for_player = function(pos)
+	local objects_in_radius = minetest.get_objects_inside_radius(pos, 16)
+	for i = 1, #objects_in_radius do
+		local object = objects_in_radius[i]
+		local player = object:is_player()
+		if player then
+			return true
+		end
+	end
+	return
+end
+
 mobs.undercrowd = function(pos, radius)
 	radius = radius or 3
 	local r = minetest.get_objects_inside_radius(pos, radius)
@@ -34,18 +46,24 @@ minetest.register_on_mods_loaded(function()
 		end
 	end
 end)
+
 mobs.redo = function(pos, radius)
+	print("Redoing.")
+
 	radius = radius or 1
+
 	local p1 = {
 		x = pos.x - radius,
 		y = pos.y - radius,
 		z = pos.z - radius,
 	}
+
 	local p2 = {
 		x = pos.x + radius,
 		y = pos.y + radius,
 		z = pos.z + radius,
 	}
+
 	local n = minetest.find_node_near(pos, radius, "mobs:spawner")
 	if n then
 		local t = minetest.get_node_timer(n)
@@ -54,6 +72,7 @@ mobs.redo = function(pos, radius)
 			t:start(1)
 		end
 	end
+
 	local a = minetest.find_nodes_in_area_under_air(p1, p2, "group:reliable")
 	if a and a[1] then
 		print("Setting spawner.")
@@ -63,6 +82,7 @@ mobs.redo = function(pos, radius)
 			y = an.y + 1,
 			z = an.z,
 		}
+		print("Setting spawner.")
 		minetest.set_node(np, {name = "mobs:spawner"})
 	end
 end
@@ -73,12 +93,14 @@ mobs.limiter = function(pos, radius, limit, immediate_surrounding, surrounding)
 	limit = limit or radius * 3
 	immediate_surrounding = immediate_surrounding or
 			minetest.get_objects_inside_radius(pos, radius)
+
 	if #immediate_surrounding > 6 then
-		print("Limiting.")
-		return redo(pos)
+		return
 	end
+
 	local surrounding = surrounding or
 			minetest.get_objects_inside_radius(pos, radius * 3)
+
 	if #surrounding > 18 then
 		local h = 0
 		for i = 1, #surrounding do
@@ -92,8 +114,7 @@ mobs.limiter = function(pos, radius, limit, immediate_surrounding, surrounding)
 			end
 		end
 		if h > limit then
-			print("Limiting.")
-			return redo(pos)
+			return
 		end
 	end
 end
@@ -115,7 +136,9 @@ minetest.register_globalstep(function(dtime)
 		if not pos then
 			break
 		end
+
 		undercrowd(pos, 8)
+
 		if minetest.find_node_near(pos, 8, "mobs:spawner") then
 			break
 		end
@@ -128,10 +151,12 @@ minetest.register_globalstep(function(dtime)
 		if minetest.get_node_or_nil(pos).name ~= "air" then
 			break
 		end
+
 		local added = minetest.add_node(pos, {name = "mobs:spawner"})
 		if not added then
 			break
 		end
+
 		minetest.get_node_timer(pos):start(0)
 	end
 end)

@@ -4,6 +4,7 @@
 
 local random = math.random
 local redo = mobs.redo
+local check_for_player = mobs.check_for_player
 local limiter = mobs.limiter
 
 minetest.register_node("mobs:spawner", {
@@ -24,78 +25,84 @@ minetest.register_node("mobs:spawner", {
 	on_blast = function()
 	end,
 	on_timer = function(pos, elapsed)
-		if elapsed >= 30 then
-			local node = minetest.get_node_or_nil({
-				x = pos.x,
-				y = pos.y - 1,
-				z = pos.z,
-			})
-			if node and node.name then
-				local node_below = minetest.registered_nodes[node.name]
-				if node_below and not node_below.walkable then
-					return redo(pos)
-				end
-			end
-			local light = minetest.get_node_light(pos)
-			limiter(pos)
-			local mobs = {
-				"mobs:rat",
-				"mobs:npc",
-			}
-			local biome = minetest.get_biome_name(minetest.get_biome_data(pos).biome)
-			local tod = (minetest.get_timeofday() or 0) * 24000
-			local night = tod > 19000 or tod < 06000
-			local protection = minetest.find_node_near(pos, 13,
-					{"protector:protect", "protector:protect2"}, true)
-			if not protection and (biome == "underground" or night) and
-						light < 3 then
-				local mobs_to_insert = {
-					"mobs:dungeon_master",
-					"mobs:oerkki",
-					"mobs:zombie" .. random(4),
-				}
-				for i = 1, #mobs_to_insert do
-					mobs[#mobs + 1] = mobs_to_insert[i]
-				end
-			end
-			if biome ~= "underground" then
-				local mobs_to_insert = {
-					"mobs:sheep_white",
-					"mobs:kitten",
-					"mobs:bunny",
-				}
-				for i = 1, #mobs_to_insert do
-					mobs[#mobs + 1] = mobs_to_insert[i]
-				end
-			end
-			local mob = mobs[random(#mobs)]
-			local colbox = minetest.registered_entities[mob].collisionbox
-			local spawn_pos = {
-				x = pos.x,
-				y = pos.y + 1.6,
-				z = pos.z,
-			}
-			local p1 = {
-				x = spawn_pos.x + colbox[1],
-				y = spawn_pos.y + colbox[2],
-				z = spawn_pos.z + colbox[3],
-			}
-			local p2 = {
-				x = spawn_pos.x + colbox[4],
-				y = spawn_pos.y + colbox[5],
-				z = spawn_pos.z + colbox[6],
-			}
-			-- Check mob's collisionbox for adequate space to spawn.
-			local d = vector.distance(p1, p2)
-			local r, s = minetest.find_nodes_in_area(p1, p2, "air", true)
-			if s["air"] < d then
+		if check_for_player(pos) then
+			minetest.get_node_timer(pos):set(10, 0)
+		end
+			
+		limiter(pos)
+
+		local node = minetest.get_node_or_nil({
+			x = pos.x,
+			y = pos.y - 1,
+			z = pos.z,
+		})
+
+		if node and node.name then
+			local node_below = minetest.registered_nodes[node.name]
+			if node_below and not node_below.walkable then
 				return redo(pos)
 			end
-			minetest.add_entity(spawn_pos, mob)
-			redo(pos)
-		else
-			minetest.get_node_timer(pos):set(elapsed + 1, elapsed)
 		end
+
+		local light = minetest.get_node_light(pos)
+
+		local mobs = {
+			"mobs:rat",
+			"mobs:npc",
+		}
+		local biome = minetest.get_biome_name(minetest.get_biome_data(pos).biome)
+		local tod = (minetest.get_timeofday() or 0) * 24000
+		local night = tod > 19000 or tod < 06000
+		local protection = minetest.find_node_near(pos, 13,
+				{"protector:protect", "protector:protect2"}, true)
+		if not protection and (biome == "underground" or night) and
+					light < 3 then
+			local mobs_to_insert = {
+				"mobs:dungeon_master",
+				"mobs:oerkki",
+				"mobs:zombie" .. random(4),
+			}
+			for i = 1, #mobs_to_insert do
+				mobs[#mobs + 1] = mobs_to_insert[i]
+			end
+		end
+		if biome ~= "underground" then
+			local mobs_to_insert = {
+				"mobs:sheep_white",
+				"mobs:kitten",
+				"mobs:bunny",
+			}
+			for i = 1, #mobs_to_insert do
+				mobs[#mobs + 1] = mobs_to_insert[i]
+			end
+		end
+		local mob = mobs[random(#mobs)]
+		local colbox = minetest.registered_entities[mob].collisionbox
+		local spawn_pos = {
+			x = pos.x,
+			y = pos.y + 1.6,
+			z = pos.z,
+		}
+		local p1 = {
+			x = spawn_pos.x + colbox[1],
+			y = spawn_pos.y + colbox[2],
+			z = spawn_pos.z + colbox[3],
+		}
+		local p2 = {
+			x = spawn_pos.x + colbox[4],
+			y = spawn_pos.y + colbox[5],
+			z = spawn_pos.z + colbox[6],
+		}
+		-- Check mob's collisionbox for adequate space to spawn.
+		local d = vector.distance(p1, p2)
+		local r, s = minetest.find_nodes_in_area(p1, p2, "air", true)
+		if s["air"] < d then
+			return redo(pos)
+		end
+
+		print("Spawning " .. mob)
+		minetest.add_entity(spawn_pos, mob)
+		redo(pos)
 	end,
 })
 
