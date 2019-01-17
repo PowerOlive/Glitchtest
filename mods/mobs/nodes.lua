@@ -1,7 +1,11 @@
 -- mobs/nodes.lua is part of Glitchtest
 -- Copyright 2018 James Stevenson
 -- GNU GPL 3
+
 local random = math.random
+local redo = mobs.redo
+local limiter = mobs.limiter
+
 minetest.register_node("mobs:spawner", {
 	description = "I spawn things!",
 	drawtype = "airlike",
@@ -24,35 +28,16 @@ minetest.register_node("mobs:spawner", {
 			local node = minetest.get_node_or_nil({
 				x = pos.x,
 				y = pos.y - 1,
-				z = pos.z
+				z = pos.z,
 			})
 			if node and node.name then
 				local node_below = minetest.registered_nodes[node.name]
 				if node_below and not node_below.walkable then
-					return minetest.set_node(pos, {name = "air"})
+					return redo(pos)
 				end
 			end
-			local immediate_surrounding = minetest.get_objects_inside_radius(pos, 2.67)
-			if #immediate_surrounding > 0 then
-				return minetest.set_node(pos, {name = "air"})
-			end
-			local surrounding = minetest.get_objects_inside_radius(pos, 24)
-			if #surrounding > 6 then
-				local h = 0
-				for i = 1, #surrounding do
-					local s = surrounding[i]
-					local sl = s:get_luaentity()
-					if sl and sl.health then
-						h = h + 1
-					end
-					if s:is_player() then
-						h = h + 2
-					end
-				end
-				if h > 10 then
-					return minetest.set_node(pos, {name = "air"})
-				end
-			end
+			local light = minetest.get_node_light(pos)
+			limiter(pos)
 			local mobs = {
 				"mobs:rat",
 				"mobs:npc",
@@ -63,7 +48,7 @@ minetest.register_node("mobs:spawner", {
 			local protection = minetest.find_node_near(pos, 13,
 					{"protector:protect", "protector:protect2"}, true)
 			if not protection and (biome == "underground" or night) and
-						minetest.get_node_light(pos) < 9 then
+						light < 3 then
 				local mobs_to_insert = {
 					"mobs:dungeon_master",
 					"mobs:oerkki",
@@ -100,51 +85,33 @@ minetest.register_node("mobs:spawner", {
 				y = spawn_pos.y + colbox[5],
 				z = spawn_pos.z + colbox[6],
 			}
+			-- Check mob's collisionbox for adequate space to spawn.
 			local d = vector.distance(p1, p2)
 			local r, s = minetest.find_nodes_in_area(p1, p2, "air", true)
 			if s["air"] < d then
-				return minetest.set_node(pos, {name = "air"})
+				return redo(pos)
 			end
 			minetest.add_entity(spawn_pos, mob)
-			minetest.set_node(r[random(#r)], {name = "mobs:spawner"})
-			return minetest.set_node(pos, {name = "air"})
+			redo(pos)
 		else
 			minetest.get_node_timer(pos):set(elapsed + 1, elapsed)
 		end
 	end,
 })
+
 minetest.register_abm({
 	label = "Spawner Limiter",
 	nodenames = {"mobs:spawner"},
 	--neighbors = {},
-	interval = 1,
+	interval = 5,
 	chance = 1,
 	catch_up = false,
 	action = function(pos, node, active_object_count, active_object_count_wider)
-		local i = active_object_count
-		local s = active_object_count_wider
-		local t = minetest.get_node_timer(pos)
-		if not t or not t:is_started() then
-			return minetest.set_node(pos, {name = "air"})
-		end
-		if s > 9 or i > 3 then
-			local things = minetest.get_objects_inside_radius(pos, 24)
-			local ttl = 0
-			for k, v in pairs(things) do
-				local h = v:get_luaentity()
-				if h and h.health and h.health > 0 then
-					ttl = ttl + 1
-				end
-				local p = v:is_player()
-				if p then
-					ttl = ttl + 2
-				end
-			end
-			if ttl > 12 then
-				minetest.set_node(pos, {name = "air"})
-			end
-		end
+		print(#active_object_count, #active_object_count_wider)
+		print(active_object_count, active_object_count_wider)
+		limiter(pos)
 	end,
 })
+
 --minetest.register_lbm()
 --minetest.register_on_mapgen()

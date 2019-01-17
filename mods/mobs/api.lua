@@ -9,20 +9,15 @@
 local MP = minetest.get_modpath(minetest.get_current_modname())
 local S, NS = dofile(MP .. "/intllib.lua")
 local use_cmi = minetest.global_exists("cmi")
-
-mobs = {
-	mod = "redo",
-	version = "20180915",
-	intllib = S,
-	invis = minetest.global_exists("invisibility") and invisibility or {},
-}
+local undercrowd = mobs.undercrowd
+mobs.intllib = S
+mobs.invis = {}
 
 -- creative check
 local creative_cache = minetest.settings:get_bool("creative_mode")
 function mobs.is_creative(name)
 	return creative_cache or minetest.check_player_privs(name, {creative = true})
 end
-
 
 -- localize math functions
 local pi = math.pi
@@ -34,7 +29,7 @@ local min = math.min
 local max = math.max
 local atann = math.atan
 local random = math.random
-print(random(20))
+print(random(10) + random(10))
 local floor = math.floor
 local atan = function(x)
 	if not x or x ~= x then
@@ -2934,6 +2929,7 @@ local mob_step = function(self, dtime)
 		self.stepper = random() 
 	end
 	local t = 0
+	--[[
 	for k, v in pairs(minetest.get_objects_inside_radius(pos, 24)) do
 		local s = v:get_luaentity()
 		if s and s.health then
@@ -2947,6 +2943,8 @@ local mob_step = function(self, dtime)
 			end
 		end
 	end
+	--]]
+	undercrowd(pos, 8)
 	if minetest.find_node_near(pos, 8, "mobs:spawner") then
 		return
 	end
