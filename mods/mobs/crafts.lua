@@ -24,6 +24,7 @@ local hairball_items = {
 minetest.register_craftitem("mobs:hairball", {
 	description = S("Lucky Hairball"),
 	inventory_image = "farming_string.png^(farming_string.png^[transformFYR90)",
+	stack_max = 1,
 	on_use = function(itemstack, user, pointed_thing)
 		local pos = user:get_pos()
 		local dir = user:get_look_dir()
