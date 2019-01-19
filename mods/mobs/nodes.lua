@@ -25,11 +25,22 @@ minetest.register_node("mobs:spawner", {
 	on_blast = function()
 	end,
 	on_timer = function(pos, elapsed)
-		if check_for_player(pos) then
-			minetest.get_node_timer(pos):set(10, 0)
+		print(dump(pos), elapsed)
+		if elapsed < 10 then
+			minetest.get_node_timer(pos):set(10, elapsed + 0.1)
+			return
+		else
+			minetest.get_node_timer(pos):start(10)
 		end
 			
-		limiter(pos)
+		if check_for_player(pos) then
+			minetest.get_node_timer(pos):start(10)
+			return
+		end
+
+		if limiter(pos) then
+			return
+		end
 
 		local node = minetest.get_node_or_nil({
 			x = pos.x,
@@ -115,7 +126,9 @@ minetest.register_abm({
 	catch_up = false,
 	action = function(pos, node, active_object_count, active_object_count_wider)
 		--print(active_object_count, active_object_count_wider)
-		limiter(pos)
+		if limiter(pos) then
+			minetest.set_node(pos, {name = "air"})
+		end
 	end,
 })
 

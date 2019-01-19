@@ -1,7 +1,9 @@
 local random = math.random
+local stepper = 0
 
-mobs.check_for_player = function(pos)
-	local objects_in_radius = minetest.get_objects_inside_radius(pos, 16)
+mobs.check_for_player = function(pos, radius)
+	radius = radius or 32
+	local objects_in_radius = minetest.get_objects_inside_radius(pos, radius)
 	for i = 1, #objects_in_radius do
 		local object = objects_in_radius[i]
 		local player = object:is_player()
@@ -69,13 +71,12 @@ mobs.redo = function(pos, radius)
 		local t = minetest.get_node_timer(n)
 		if not t:is_started() then
 			print("Restarting timer.")
-			t:start(1)
+			t:start(10)
 		end
 	end
 
 	local a = minetest.find_nodes_in_area_under_air(p1, p2, "group:reliable")
 	if a and a[1] then
-		print("Setting spawner.")
 		local an = a[random(#a)]
 		local np = {
 			x = an.x,
@@ -95,7 +96,7 @@ mobs.limiter = function(pos, radius, limit, immediate_surrounding, surrounding)
 			minetest.get_objects_inside_radius(pos, radius)
 
 	if #immediate_surrounding > 6 then
-		return
+		return true
 	end
 
 	local surrounding = surrounding or
@@ -114,12 +115,11 @@ mobs.limiter = function(pos, radius, limit, immediate_surrounding, surrounding)
 			end
 		end
 		if h > limit then
-			return
+			return true
 		end
 	end
 end
 
-local stepper = 0
 minetest.register_globalstep(function(dtime)
 	if stepper < 10 then
 		stepper = stepper + dtime
@@ -157,6 +157,6 @@ minetest.register_globalstep(function(dtime)
 			break
 		end
 
-		minetest.get_node_timer(pos):start(0)
+		minetest.get_node_timer(pos):start(10)
 	end
 end)
