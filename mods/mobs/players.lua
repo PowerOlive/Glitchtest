@@ -141,6 +141,7 @@ minetest.register_globalstep(function(dtime)
 	else
 		stepper = 0
 	end
+
 	local players = minetest.get_connected_players()
 	for i = 1, #players do
 		if players[i] == "" then
@@ -173,6 +174,6 @@ minetest.register_globalstep(function(dtime)
 			break
 		end
 
-		minetest.get_node_timer(pos):start(10)
+		minetest.get_node_timer(pos):start(0)
 	end
 end)
