@@ -2921,6 +2921,7 @@ local mob_step = function(self, dtime)
 	do_states(self, dtime)
 	do_jump(self)
 	runaway_from(self)
+	--[[
 	local stepper = self.stepper or random()
 	self.stepper = stepper + dtime
 	if self.stepper < 10 then
@@ -2929,6 +2930,7 @@ local mob_step = function(self, dtime)
 		self.stepper = random() 
 	end
 	local t = 0
+	--]]
 	--[[
 	for k, v in pairs(minetest.get_objects_inside_radius(pos, 24)) do
 		local s = v:get_luaentity()
@@ -2944,6 +2946,7 @@ local mob_step = function(self, dtime)
 		end
 	end
 	--]]
+	--[[
 	undercrowd(pos, 8)
 	if minetest.find_node_near(pos, 8, "mobs:spawner") then
 		return
@@ -2966,6 +2969,7 @@ local mob_step = function(self, dtime)
 	end
 	--print("Mob spawns Spawny the Spawner!")
 	minetest.get_node_timer(pos):start(0)
+	--]]
 end
 
 

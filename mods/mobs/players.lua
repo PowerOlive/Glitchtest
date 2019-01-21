@@ -129,7 +129,7 @@ mobs.limiter = function(pos, radius, limit, immediate_surrounding, surrounding)
 		end
 	end
 end
-
+--[[
 minetest.register_globalstep(function(dtime)
 	if stepper < 10 then
 		stepper = stepper + dtime
@@ -173,3 +173,4 @@ minetest.register_globalstep(function(dtime)
 		minetest.get_node_timer(pos):start(0)
 	end
 end)
+--]]
