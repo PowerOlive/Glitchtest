@@ -55,7 +55,8 @@ minetest.register_node("mobs:spawner", {
 		if node and node.name then
 			local node_below = minetest.registered_nodes[node.name]
 			if node_below and not node_below.walkable then
-				return redo(pos)
+				erase(pos)
+				return
 			end
 		end
 

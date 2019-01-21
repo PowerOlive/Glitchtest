@@ -64,8 +64,6 @@ minetest.register_on_mods_loaded(function()
 end)
 
 mobs.redo = function(pos, radius)
-	print("Redoing.")
-
 	radius = radius or 1
 
 	local p1 = {
@@ -84,8 +82,7 @@ mobs.redo = function(pos, radius)
 	if n then
 		local t = minetest.get_node_timer(n)
 		if not t:is_started() then
-			print("Restarting timer.")
-			t:start(10)
+			t:start(0)
 		end
 	end
 
@@ -97,7 +94,6 @@ mobs.redo = function(pos, radius)
 			y = an.y + 1,
 			z = an.z,
 		}
-		print("Setting spawner.")
 		minetest.set_node(np, {name = "mobs:spawner"})
 	end
 end
