@@ -6,6 +6,7 @@ local random = math.random
 local redo = mobs.redo
 local check_for_player = mobs.check_for_player
 local limiter = mobs.limiter
+local erase = mobs.erase
 
 minetest.register_node("mobs:spawner", {
 	description = "I spawn things!",
@@ -25,16 +26,19 @@ minetest.register_node("mobs:spawner", {
 	on_blast = function()
 	end,
 	on_timer = function(pos, elapsed)
-		print(dump(pos), elapsed)
+		if elapsed > 10 then
+			erase(pos)
+		end
+
 		if elapsed < 10 then
 			minetest.get_node_timer(pos):set(10, elapsed + 0.1)
 			return
 		else
-			minetest.get_node_timer(pos):start(10)
+			minetest.get_node_timer(pos):start(0)
 		end
 			
 		if check_for_player(pos) then
-			minetest.get_node_timer(pos):start(10)
+			minetest.get_node_timer(pos):start(0)
 			return
 		end
 
@@ -113,7 +117,7 @@ minetest.register_node("mobs:spawner", {
 
 		print("Spawning " .. mob)
 		minetest.add_entity(spawn_pos, mob)
-		redo(pos)
+		erase(pos)
 	end,
 })
 

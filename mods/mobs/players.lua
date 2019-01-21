@@ -1,6 +1,20 @@
 local random = math.random
 local stepper = 0
 
+mobs.erase = function(pos)
+	local n = minetest.get_node_or_nil(pos)
+	local nn = n.name
+
+	if not nn then
+		return
+	end
+
+	if nn == "mobs:spawner" then
+		minetest.set_node(pos, {name = "air"})
+		return true
+	end
+end
+
 mobs.check_for_player = function(pos, radius)
 	radius = radius or 32
 	local objects_in_radius = minetest.get_objects_inside_radius(pos, radius)
@@ -15,7 +29,7 @@ mobs.check_for_player = function(pos, radius)
 end
 
 mobs.undercrowd = function(pos, radius)
-	radius = radius or 3
+	radius = radius or 8
 	local r = minetest.get_objects_inside_radius(pos, radius)
 	local t = 0
 	for _, v in pairs(r) do
@@ -30,10 +44,10 @@ mobs.undercrowd = function(pos, radius)
 			t = t + 1
 		end
 		if t > 5 then
-			print("Overcrowded.")
-			return v:remove()
+			v:remove()
 		end
 	end
+	return t
 end
 local undercrowd = mobs.undercrowd
 
@@ -137,7 +151,9 @@ minetest.register_globalstep(function(dtime)
 			break
 		end
 
-		undercrowd(pos, 8)
+		if undercrowd(pos, 32) > 3 then
+			break
+		end
 
 		if minetest.find_node_near(pos, 8, "mobs:spawner") then
 			break
